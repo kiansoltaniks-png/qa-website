@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: qa-website
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false

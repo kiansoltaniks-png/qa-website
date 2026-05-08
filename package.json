@@ -1,0 +1,15 @@
+{
+  "name": "qa-website",
+  "version": "1.0.0",
+  "description": "Ask anything - AI-powered Q&A website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2"
+  }
+}

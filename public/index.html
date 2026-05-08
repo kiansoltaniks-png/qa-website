@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask Anything</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f0f1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 28px 32px 20px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      border-bottom: 1px solid #4338ca44;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header .logo { font-size: 2rem; }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p { font-size: 0.85rem; color: #94a3b8; margin-top: 2px; }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      gap: 24px;
+    }
+
+    /* ── Topic chips ── */
+    .topic-section label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #cbd5e1;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+    }
+    .chip:hover { border-color: #7c3aed; color: #a78bfa; }
+    .chip.active {
+      background: #4c1d95;
+      border-color: #7c3aed;
+      color: #ddd6fe;
+      font-weight: 600;
+    }
+    #custom-topic {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 0.83rem;
+      width: 180px;
+    }
+    #custom-topic:focus { outline: 2px solid #7c3aed; }
+    #custom-topic::placeholder { color: #475569; }
+
+    /* ── Question box ── */
+    .question-section { display: flex; flex-direction: column; gap: 10px; }
+    .question-section label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    #question-input {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color .18s;
+    }
+    #question-input:focus { outline: none; border-color: #7c3aed; }
+    #question-input::placeholder { color: #475569; }
+
+    /* ── Ask button ── */
+    #ask-btn {
+      align-self: flex-end;
+      padding: 12px 32px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .18s, transform .1s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #ask-btn:hover { opacity: .9; }
+    #ask-btn:active { transform: scale(.97); }
+    #ask-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Answer card ── */
+    #answer-section { display: none; }
+    .answer-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .answer-header {
+      background: linear-gradient(90deg, #1e1b4b, #1e293b);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #334155;
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+    .answer-header .badge {
+      padding: 3px 10px;
+      background: #4c1d95;
+      border-radius: 999px;
+      color: #ddd6fe;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .answer-body {
+      padding: 20px 24px;
+      line-height: 1.75;
+      font-size: 0.97rem;
+      white-space: pre-wrap;
+    }
+
+    /* ── History ── */
+    #history-section { margin-top: 8px; }
+    #history-section h2 {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      background: #1e293b;
+      border: 1px solid #273344;
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color .18s;
+    }
+    .history-item:hover { border-color: #7c3aed; }
+    .history-item .q {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item .meta { font-size: 0.74rem; color: #475569; margin-top: 3px; }
+
+    /* ── Error ── */
+    .error-msg {
+      background: #450a0a;
+      border: 1px solid #991b1b;
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.75rem;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📚</div>
+  <div>
+    <h1>Ask Anything</h1>
+    <p>Spanish · Language Arts · Any Topic — powered by Claude AI</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- Topic Chips -->
+  <div class="topic-section">
+    <label>Choose a Topic</label>
+    <div class="chips">
+      <div class="chip active" data-topic="Spanish">🇪🇸 Spanish</div>
+      <div class="chip" data-topic="Language Arts">✏️ Language Arts</div>
+      <div class="chip" data-topic="Math">🔢 Math</div>
+      <div class="chip" data-topic="Science">🔬 Science</div>
+      <div class="chip" data-topic="History">🏛️ History</div>
+      <div class="chip" data-topic="Grammar">📖 Grammar</div>
+      <div class="chip" data-topic="Writing">🖊️ Writing</div>
+      <div class="chip" data-topic="custom">✨ Other...</div>
+    </div>
+    <div style="margin-top:10px; display:none;" id="custom-wrap">
+      <input id="custom-topic" type="text" placeholder="Type your topic…" />
+    </div>
+  </div>
+
+  <!-- Question -->
+  <div class="question-section">
+    <label>Your Question</label>
+    <textarea id="question-input" placeholder="Type your question here… e.g. ¿Cómo se usa el subjuntivo?"></textarea>
+    <button id="ask-btn">
+      <span id="btn-text">Ask</span>
+      <span id="btn-icon">→</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <!-- Answer -->
+  <div id="answer-section">
+    <div class="answer-card">
+      <div class="answer-header">
+        <span>Answer</span>
+        <span class="badge" id="answer-topic-badge">Spanish</span>
+      </div>
+      <div class="answer-body" id="answer-body"></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="history-section" style="display:none;">
+    <h2>Recent Questions</h2>
+    <div class="history-list" id="history-list"></div>
+  </div>
+
+</main>
+
+<footer>Ask Anything · Your personal study assistant</footer>
+
+<script>
+  let selectedTopic = 'Spanish';
+  let history = JSON.parse(localStorage.getItem('qa_history') || '[]');
+
+  // ── Chips ──
+  const chips      = document.querySelectorAll('.chip');
+  const customWrap = document.getElementById('custom-wrap');
+  const customIn   = document.getElementById('custom-topic');
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      if (chip.dataset.topic === 'custom') {
+        customWrap.style.display = 'block';
+        customIn.focus();
+        selectedTopic = customIn.value.trim() || 'General';
+      } else {
+        customWrap.style.display = 'none';
+        selectedTopic = chip.dataset.topic;
+      }
+    });
+  });
+  customIn.addEventListener('input', () => {
+    selectedTopic = customIn.value.trim() || 'General';
+  });
+
+  // ── Ask ──
+  const askBtn     = document.getElementById('ask-btn');
+  const btnText    = document.getElementById('btn-text');
+  const btnIcon    = document.getElementById('btn-icon');
+  const spinner    = document.getElementById('spinner');
+  const qInput     = document.getElementById('question-input');
+  const ansSection = document.getElementById('answer-section');
+  const ansBody    = document.getElementById('answer-body');
+  const ansBadge   = document.getElementById('answer-topic-badge');
+
+  askBtn.addEventListener('click', askQuestion);
+  qInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) askQuestion();
+  });
+
+  async function askQuestion() {
+    const q = qInput.value.trim();
+    if (!q) { shake(qInput); return; }
+
+    setLoading(true);
+    ansSection.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, topic: selectedTopic })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+
+      showAnswer(data.answer, selectedTopic);
+      saveHistory(q, data.answer, selectedTopic);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showAnswer(text, topic) {
+    ansBadge.textContent = topic;
+    ansBody.textContent = text;
+    ansSection.style.display = 'block';
+    ansSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showError(msg) {
+    ansBody.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+    ansBadge.textContent = 'Error';
+    ansSection.style.display = 'block';
+  }
+
+  function setLoading(on) {
+    askBtn.disabled = on;
+    spinner.style.display = on ? 'block' : 'none';
+    btnText.textContent = on ? 'Thinking…' : 'Ask';
+    btnIcon.style.display = on ? 'none' : 'inline';
+  }
+
+  function saveHistory(q, a, topic) {
+    history.unshift({ q, a, topic, time: Date.now() });
+    if (history.length > 20) history = history.slice(0, 20);
+    localStorage.setItem('qa_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const sec  = document.getElementById('history-section');
+    const list = document.getElementById('history-list');
+    if (!history.length) { sec.style.display = 'none'; return; }
+    sec.style.display = 'block';
+    list.innerHTML = history.slice(0, 6).map((item, i) => `
+      <div class="history-item" data-index="${i}">
+        <div class="q">${escHtml(item.q)}</div>
+        <div class="meta">${item.topic} · ${timeAgo(item.time)}</div>
+      </div>
+    `).join('');
+    list.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const item = history[+el.dataset.index];
+        qInput.value = item.q;
+        showAnswer(item.a, item.topic);
+      });
+    });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function timeAgo(ts) {
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return `${Math.floor(s/60)}m ago`;
+    if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+    return `${Math.floor(s/86400)}d ago`;
+  }
+
+  function shake(el) {
+    el.style.borderColor = '#ef4444';
+    setTimeout(() => { el.style.borderColor = ''; }, 1000);
+  }
+
+  renderHistory();
+</script>
+</body>
+</html>
