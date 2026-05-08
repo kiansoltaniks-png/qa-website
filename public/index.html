@@ -3,902 +3,1720 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ask Anything</title>
+  <title>StudyAI</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f0f1a;
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a14;--surface:#111827;--surface2:#1e293b;--surface3:#243044;
+      --border:#1e293b;--border2:#334155;
+      --purple:#7c3aed;--purple2:#4c1d95;--purple3:#3b0764;
+      --blue:#3b82f6;--teal:#0d9488;--green:#065f46;
+      --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
     }
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 
-    header {
-      padding: 24px 32px 18px;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-      border-bottom: 1px solid #4338ca44;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    header .logo { font-size: 1.9rem; }
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #a78bfa, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    header p { font-size: 0.82rem; color: #94a3b8; margin-top: 2px; }
+    /* ══ HEADER ══ */
+    header{padding:16px 24px;background:linear-gradient(135deg,#1e1b4b,#1a2744);border-bottom:1px solid #4338ca33;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+    header h1{font-size:1.3rem;font-weight:800;background:linear-gradient(90deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    header span{font-size:1.5rem}
+    .header-sub{font-size:0.75rem;color:var(--muted2)}
 
-    main {
-      flex: 1;
-      max-width: 900px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    /* ══ NAV TABS ══ */
+    nav{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;white-space:nowrap;padding:0 16px}
+    nav::-webkit-scrollbar{display:none}
+    .nav-tab{display:inline-flex;align-items:center;gap:6px;padding:12px 16px;font-size:0.8rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none}
+    .nav-tab:hover{color:var(--muted2)}
+    .nav-tab.active{color:#a78bfa;border-bottom-color:#7c3aed;font-weight:600}
 
-    .sec-label {
-      font-size: 0.75rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 8px;
-      display: block;
-    }
+    /* ══ LAYOUT ══ */
+    .app-body{flex:1;max-width:960px;width:100%;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
 
-    /* ── Mode switcher ── */
-    .mode-switcher {
-      display: flex;
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 4px;
-      gap: 4px;
-      border: 1px solid #334155;
-    }
-    .mode-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 9px;
-      border: none;
-      background: transparent;
-      color: #64748b;
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .18s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-    }
-    .mode-btn.active {
-      background: linear-gradient(135deg, #4c1d95, #1e3a5f);
-      color: #e2e8f0;
-      font-weight: 600;
-    }
-    .mode-btn:hover:not(.active) { color: #a78bfa; }
+    /* ══ SECTION ══ */
+    .section{display:none;flex-direction:column;gap:18px}
+    .section.active{display:flex}
 
-    /* ── Chips ── */
-    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip {
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #cbd5e1;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-    .chip:hover { border-color: #7c3aed; color: #a78bfa; }
-    .chip.active {
-      background: #4c1d95;
-      border-color: #7c3aed;
-      color: #ddd6fe;
-      font-weight: 600;
-    }
-    #custom-topic, #gen-custom-topic {
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-size: 0.8rem;
-      width: 160px;
-    }
-    #custom-topic:focus, #gen-custom-topic:focus { outline: 2px solid #7c3aed; }
+    /* ══ CARDS ══ */
+    .card{background:var(--surface2);border:1px solid var(--border2);border-radius:14px;overflow:hidden}
+    .card-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
 
-    /* ── Customize panel ── */
-    .customize-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      color: #94a3b8;
-      font-size: 0.83rem;
-      user-select: none;
-      width: fit-content;
-    }
-    .customize-toggle:hover { color: #a78bfa; }
-    .toggle-arrow { transition: transform .2s; display: inline-block; }
-    .toggle-arrow.open { transform: rotate(90deg); }
+    /* ══ LABELS ══ */
+    .sec-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px}
+    .section-title{font-size:1.1rem;font-weight:700;color:#ddd6fe;display:flex;align-items:center;gap:8px}
+    .section-desc{font-size:0.82rem;color:var(--muted2);line-height:1.5}
 
-    .customize-panel {
-      background: #151f2e;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 20px;
-      display: none;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .customize-panel.open { display: flex; }
+    /* ══ TOPIC CHIPS ══ */
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{padding:5px 13px;border-radius:999px;border:1px solid var(--border2);background:var(--surface2);color:#cbd5e1;font-size:0.78rem;cursor:pointer;transition:all .15s;user-select:none}
+    .chip:hover{border-color:var(--purple);color:#a78bfa}
+    .chip.active{background:var(--purple2);border-color:var(--purple);color:#ddd6fe;font-weight:600}
 
-    .option-row { display: flex; flex-direction: column; gap: 8px; }
+    /* ══ OPT CHIPS ══ */
+    .opt-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .opt-chip{padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted2);font-size:0.76rem;cursor:pointer;transition:all .15s;user-select:none}
+    .opt-chip:hover{border-color:#5b21b6;color:#c4b5fd}
+    .opt-chip.active{background:var(--purple3);border-color:var(--purple);color:#ddd6fe;font-weight:600}
 
-    .opt-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .opt-chip {
-      padding: 5px 13px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #94a3b8;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-    .opt-chip:hover { border-color: #5b21b6; color: #c4b5fd; }
-    .opt-chip.active {
-      background: #3b0764;
-      border-color: #7c3aed;
-      color: #ddd6fe;
-      font-weight: 600;
-    }
+    /* ══ TOGGLE PILLS ══ */
+    .toggles-row{display:flex;flex-wrap:wrap;gap:8px}
+    .toggle-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:0.75rem;color:var(--muted);user-select:none;transition:all .15s}
+    .toggle-pill.on{background:#134e4a;border-color:var(--teal);color:#5eead4}
+    .toggle-pill .dot{width:7px;height:7px;border-radius:50%;background:#475569;transition:background .15s}
+    .toggle-pill.on .dot{background:#2dd4bf}
 
-    .toggles-row { display: flex; flex-wrap: wrap; gap: 10px; }
-    .toggle-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      cursor: pointer;
-      font-size: 0.78rem;
-      color: #94a3b8;
-      user-select: none;
-      transition: all .15s;
-    }
-    .toggle-pill.on { background: #134e4a; border-color: #0d9488; color: #5eead4; }
-    .toggle-pill .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #475569;
-      transition: background .15s;
-    }
-    .toggle-pill.on .dot { background: #2dd4bf; }
+    /* ══ INPUTS ══ */
+    textarea,.text-input,.num-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:0.92rem;font-family:inherit;transition:border-color .18s}
+    textarea{min-height:90px;resize:vertical}
+    textarea:focus,.text-input:focus,.num-input:focus{outline:none;border-color:var(--purple)}
+    textarea::placeholder,.text-input::placeholder{color:#475569}
+    .num-input{width:90px}
+    .input-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .input-row .text-input{flex:1;min-width:180px}
 
-    .custom-length-wrap { display: none; align-items: center; gap: 8px; margin-top: 6px; }
-    .custom-length-wrap.show { display: flex; }
-    .custom-length-wrap input, .num-input {
-      width: 90px;
-      padding: 5px 10px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-size: 0.82rem;
-    }
-    .custom-length-wrap input:focus, .num-input:focus { outline: 2px solid #7c3aed; }
-    .custom-length-wrap span, .field-hint { font-size: 0.78rem; color: #64748b; }
+    /* ══ BUTTONS ══ */
+    .btn{padding:10px 26px;border-radius:10px;border:none;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity .18s,transform .1s;display:inline-flex;align-items:center;gap:7px}
+    .btn:hover{opacity:.88}
+    .btn:active{transform:scale(.97)}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .btn-purple{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white}
+    .btn-teal{background:linear-gradient(135deg,#065f46,#0d9488);color:white}
+    .btn-blue{background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:white}
+    .btn-orange{background:linear-gradient(135deg,#92400e,#d97706);color:white}
+    .btn-pink{background:linear-gradient(135deg,#831843,#db2777);color:white}
+    .btn-row{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 
-    .divider { border: none; border-top: 1px solid #1e293b; }
+    .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── Text inputs ── */
-    textarea, .text-input {
-      width: 100%;
-      padding: 13px 15px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #e2e8f0;
-      font-size: 0.97rem;
-      font-family: inherit;
-      transition: border-color .18s;
-    }
-    textarea { min-height: 95px; resize: vertical; }
-    textarea:focus, .text-input:focus { outline: none; border-color: #7c3aed; }
-    textarea::placeholder, .text-input::placeholder { color: #475569; }
+    /* ══ OUTPUT CARD ══ */
+    .output-card{display:none;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;overflow:hidden}
+    .output-header{background:linear-gradient(90deg,#1e1b4b,var(--surface2));padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border2);font-size:0.78rem;color:var(--muted2);flex-wrap:wrap}
+    .output-body{padding:16px 20px;line-height:1.8;font-size:0.92rem;white-space:pre-wrap}
+    .badge{padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:700}
+    .badge-purple{background:var(--purple2);color:#ddd6fe}
+    .badge-blue{background:#1e3a5f;color:#93c5fd}
+    .badge-green{background:#134e4a;color:#5eead4}
+    .badge-orange{background:#431407;color:#fdba74}
+    .badge-pink{background:#500724;color:#fbcfe8}
+    .copy-btn{margin-left:auto;padding:3px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:0.72rem;cursor:pointer;transition:all .15s}
+    .copy-btn:hover{border-color:var(--purple);color:#a78bfa}
 
-    /* ── Buttons ── */
-    .action-btn {
-      align-self: flex-end;
-      padding: 11px 30px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, #7c3aed, #4f46e5);
-      color: white;
-      font-size: 0.97rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .18s, transform .1s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .action-btn:hover { opacity: .9; }
-    .action-btn:active { transform: scale(.97); }
-    .action-btn:disabled { opacity: .5; cursor: not-allowed; }
-    .action-btn.green { background: linear-gradient(135deg, #065f46, #0d9488); }
+    /* ══ DIVIDER ══ */
+    .divider{border:none;border-top:1px solid var(--border);margin:2px 0}
 
-    .spinner {
-      width: 15px; height: 15px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      display: none;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* ══ FLASHCARD DISPLAY ══ */
+    .flashcard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:8px}
+    .flashcard{background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;min-height:100px;display:flex;flex-direction:column;justify-content:center;position:relative}
+    .flashcard:hover{border-color:var(--purple);transform:translateY(-2px)}
+    .flashcard .fc-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+    .flashcard .fc-front{font-size:0.92rem;color:#ddd6fe;font-weight:600}
+    .flashcard .fc-back{font-size:0.85rem;color:var(--muted2);margin-top:8px;display:none;border-top:1px solid var(--border2);padding-top:8px}
+    .flashcard.flipped .fc-back{display:block}
+    .flashcard .fc-hint{font-size:0.68rem;color:#475569;position:absolute;bottom:8px;right:10px}
 
-    /* ── Answer / Output card ── */
-    .output-section { display: none; }
-    .answer-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .answer-header {
-      background: linear-gradient(90deg, #1e1b4b, #1e293b);
-      padding: 11px 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid #334155;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      flex-wrap: wrap;
-    }
-    .badge {
-      padding: 3px 10px;
-      background: #4c1d95;
-      border-radius: 999px;
-      color: #ddd6fe;
-      font-size: 0.73rem;
-      font-weight: 600;
-    }
-    .badge.green { background: #134e4a; color: #5eead4; }
-    .badge.blue  { background: #1e3a5f; color: #93c5fd; }
-    .badge.orange { background: #431407; color: #fdba74; }
-    .answer-body {
-      padding: 18px 22px;
-      line-height: 1.8;
-      font-size: 0.95rem;
-      white-space: pre-wrap;
-    }
-    .copy-btn {
-      margin-left: auto;
-      padding: 4px 12px;
-      border-radius: 6px;
-      border: 1px solid #334155;
-      background: transparent;
-      color: #64748b;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .copy-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+    /* ══ HISTORY ══ */
+    #history-section{margin-top:4px}
+    #history-section h2{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+    .history-list{display:flex;flex-direction:column;gap:6px}
+    .history-item{background:var(--surface2);border:1px solid #1e2d40;border-radius:9px;padding:9px 13px;cursor:pointer;transition:border-color .15s}
+    .history-item:hover{border-color:var(--purple)}
+    .history-item .q{font-size:0.83rem;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .history-item .meta{font-size:0.7rem;color:#475569;margin-top:2px}
 
-    /* ── History ── */
-    #history-section h2 {
-      font-size: 0.75rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 10px;
-    }
-    .history-list { display: flex; flex-direction: column; gap: 7px; }
-    .history-item {
-      background: #1e293b;
-      border: 1px solid #273344;
-      border-radius: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
-    .history-item:hover { border-color: #7c3aed; }
-    .history-item .q { font-size: 0.85rem; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .history-item .meta { font-size: 0.72rem; color: #475569; margin-top: 2px; }
+    .error-msg{background:#450a0a;border:1px solid #991b1b;color:#fca5a5;padding:10px 14px;border-radius:9px;font-size:0.85rem}
 
-    .error-msg {
-      background: #450a0a;
-      border: 1px solid #991b1b;
-      color: #fca5a5;
-      padding: 11px 14px;
-      border-radius: 10px;
-      font-size: 0.86rem;
-    }
+    /* ══ PROGRESS BAR ══ */
+    .progress-bar-wrap{background:var(--surface2);border-radius:999px;height:6px;overflow:hidden;margin-top:4px}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:999px;transition:width .3s;width:0%}
 
-    footer { text-align: center; padding: 14px; font-size: 0.72rem; color: #334155; }
+    /* ══ TWO-COL ══ */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+    /* ══ DEBATE SIDES ══ */
+    .debate-col{background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:16px}
+    .debate-col h3{font-size:0.8rem;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+    .debate-col.pro h3{color:#4ade80}
+    .debate-col.con h3{color:#f87171}
+    .debate-col p{font-size:0.88rem;color:var(--muted2);line-height:1.7;white-space:pre-wrap}
+
+    /* ══ TIMELINE ══ */
+    .timeline-list{display:flex;flex-direction:column;gap:0}
+    .timeline-item{display:flex;gap:14px;padding:12px 0}
+    .timeline-item:not(:last-child){border-bottom:1px solid var(--border)}
+    .tl-dot-wrap{display:flex;flex-direction:column;align-items:center;min-width:14px}
+    .tl-dot{width:12px;height:12px;border-radius:50%;background:var(--purple);margin-top:3px;flex-shrink:0}
+    .tl-line{flex:1;width:2px;background:var(--border2);margin-top:4px}
+    .tl-date{font-size:0.75rem;color:#a78bfa;font-weight:700;min-width:90px;padding-top:2px}
+    .tl-text{font-size:0.88rem;color:var(--muted2);line-height:1.6}
+
+    /* ══ VOCAB TABLE ══ */
+    .vocab-table{width:100%;border-collapse:collapse}
+    .vocab-table th{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--border2);text-align:left}
+    .vocab-table td{padding:10px 12px;font-size:0.86rem;border-bottom:1px solid var(--border);vertical-align:top}
+    .vocab-table tr:hover td{background:var(--surface3)}
+    .vocab-word{color:#ddd6fe;font-weight:600}
+    .vocab-def{color:var(--muted2)}
+    .vocab-ex{color:#64748b;font-style:italic;font-size:0.8rem}
+
+    footer{text-align:center;padding:12px;font-size:0.7rem;color:#334155}
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">📚</div>
+  <span>📚</span>
   <div>
-    <h1>Ask Anything</h1>
-    <p>Spanish · Language Arts · Any Topic</p>
+    <h1>StudyAI</h1>
+    <div class="header-sub">Your complete AI-powered study assistant</div>
   </div>
 </header>
 
-<main>
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-tab active" data-section="ask">💬 Ask</div>
+  <div class="nav-tab" data-section="quiz">📝 Quiz Generator</div>
+  <div class="nav-tab" data-section="flashcards">🃏 Flashcards</div>
+  <div class="nav-tab" data-section="studyguide">📖 Study Guide</div>
+  <div class="nav-tab" data-section="essay">✍️ Essay Helper</div>
+  <div class="nav-tab" data-section="vocab">📚 Vocabulary</div>
+  <div class="nav-tab" data-section="math">🔢 Math Solver</div>
+  <div class="nav-tab" data-section="translate">🌐 Translator</div>
+  <div class="nav-tab" data-section="grammar">✅ Grammar Check</div>
+  <div class="nav-tab" data-section="summarize">📋 Summarizer</div>
+  <div class="nav-tab" data-section="debate">⚖️ Debate</div>
+  <div class="nav-tab" data-section="timeline">📅 Timeline</div>
+  <div class="nav-tab" data-section="explain">🔍 Explain Like I'm 5</div>
+  <div class="nav-tab" data-section="compare">🔀 Compare & Contrast</div>
+  <div class="nav-tab" data-section="mindmap">🧠 Mind Map</div>
+</nav>
 
-  <!-- Mode switcher -->
-  <div class="mode-switcher">
-    <button class="mode-btn active" id="mode-ask">💬 Ask a Question</button>
-    <button class="mode-btn" id="mode-gen">📝 Generate Practice Questions</button>
-  </div>
+<div class="app-body">
 
-  <!-- ════════════════════════════════════════
-       ASK MODE
-  ════════════════════════════════════════ -->
-  <div id="ask-mode">
+<!-- ═══════════════════════════════════════════ ASK ═══ -->
+<div class="section active" id="sec-ask">
+  <div class="section-title">💬 Ask a Question</div>
+  <div class="section-desc">Ask anything — get a clear, customized answer from your AI tutor.</div>
 
-    <!-- Topic -->
+  <div class="card"><div class="card-body">
     <div>
       <span class="sec-label">Topic</span>
       <div class="chips" id="ask-topic-chips">
-        <div class="chip active" data-topic="Spanish">🇪🇸 Spanish</div>
-        <div class="chip" data-topic="Language Arts">✏️ Language Arts</div>
-        <div class="chip" data-topic="Math">🔢 Math</div>
-        <div class="chip" data-topic="Science">🔬 Science</div>
-        <div class="chip" data-topic="History">🏛️ History</div>
-        <div class="chip" data-topic="Grammar">📖 Grammar</div>
-        <div class="chip" data-topic="Writing">🖊️ Writing</div>
-        <div class="chip" data-topic="Geography">🌍 Geography</div>
-        <div class="chip" data-topic="Biology">🧬 Biology</div>
-        <div class="chip" data-topic="custom">✨ Other...</div>
+        <div class="chip active" data-t="Spanish">🇪🇸 Spanish</div>
+        <div class="chip" data-t="Language Arts">✏️ Language Arts</div>
+        <div class="chip" data-t="Math">🔢 Math</div>
+        <div class="chip" data-t="Science">🔬 Science</div>
+        <div class="chip" data-t="History">🏛️ History</div>
+        <div class="chip" data-t="Grammar">📖 Grammar</div>
+        <div class="chip" data-t="Writing">🖊️ Writing</div>
+        <div class="chip" data-t="Geography">🌍 Geography</div>
+        <div class="chip" data-t="Biology">🧬 Biology</div>
+        <div class="chip" data-t="Chemistry">⚗️ Chemistry</div>
+        <div class="chip" data-t="Physics">⚡ Physics</div>
+        <div class="chip" data-t="Literature">📕 Literature</div>
+        <div class="chip" data-t="Economics">💰 Economics</div>
+        <div class="chip" data-t="Psychology">🧠 Psychology</div>
+        <div class="chip" data-t="custom">✨ Other</div>
       </div>
-      <div style="margin-top:8px; display:none;" id="custom-wrap">
-        <input id="custom-topic" type="text" placeholder="Type your topic…" />
-      </div>
+      <input class="text-input" id="ask-custom-topic" style="display:none;margin-top:8px;max-width:240px" placeholder="Your topic…" />
     </div>
 
-    <!-- Customize toggle -->
+    <hr class="divider"/>
+
     <div>
-      <div class="customize-toggle" id="customize-toggle">
-        <span class="toggle-arrow" id="toggle-arrow">▶</span>
-        <span>Customize Answer</span>
-      </div>
-      <div class="customize-panel" id="customize-panel" style="margin-top:10px;">
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Answer Length</span>
-          <div class="opt-chips" id="length-chips">
-            <div class="opt-chip" data-val="1 sentence">1 Sentence</div>
-            <div class="opt-chip" data-val="2-3 sentences">2-3 Sentences</div>
-            <div class="opt-chip active" data-val="a paragraph">Paragraph</div>
-            <div class="opt-chip" data-val="detailed and thorough">Detailed</div>
-            <div class="opt-chip" data-val="as comprehensive as possible">Full Deep Dive</div>
-            <div class="opt-chip" data-val="custom">Custom...</div>
-          </div>
-          <div class="custom-length-wrap" id="custom-length-wrap">
-            <input type="number" id="custom-words" placeholder="150" min="10" max="2000" />
-            <span>max words</span>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Format</span>
-          <div class="opt-chips" id="format-chips">
-            <div class="opt-chip active" data-val="paragraph">📄 Paragraph</div>
-            <div class="opt-chip" data-val="bullet points">• Bullet Points</div>
-            <div class="opt-chip" data-val="numbered steps">1. Numbered Steps</div>
-            <div class="opt-chip" data-val="a structured outline with headers">📋 Outline</div>
-            <div class="opt-chip" data-val="a table if applicable, otherwise paragraph">📊 Table</div>
-            <div class="opt-chip" data-val="a story or narrative">📖 Story</div>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Difficulty Level</span>
-          <div class="opt-chips" id="difficulty-chips">
-            <div class="opt-chip" data-val="a 5 year old">🧒 5 Year Old</div>
-            <div class="opt-chip" data-val="an elementary school student">🎒 Elementary</div>
-            <div class="opt-chip active" data-val="a middle school student">📚 Middle School</div>
-            <div class="opt-chip" data-val="a high school student">🏫 High School</div>
-            <div class="opt-chip" data-val="a college student">🎓 College</div>
-            <div class="opt-chip" data-val="an expert in the field">🔬 Expert</div>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Tone</span>
-          <div class="opt-chips" id="tone-chips">
-            <div class="opt-chip active" data-val="friendly and encouraging">😊 Friendly</div>
-            <div class="opt-chip" data-val="professional and formal">👔 Professional</div>
-            <div class="opt-chip" data-val="casual and conversational">💬 Casual</div>
-            <div class="opt-chip" data-val="enthusiastic and energetic">⚡ Enthusiastic</div>
-            <div class="opt-chip" data-val="strict and no-nonsense">📏 Strict</div>
-            <div class="opt-chip" data-val="funny and humorous">😄 Funny</div>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Response Language</span>
-          <div class="opt-chips" id="language-chips">
-            <div class="opt-chip active" data-val="English">🇺🇸 English</div>
-            <div class="opt-chip" data-val="Spanish">🇪🇸 Spanish</div>
-            <div class="opt-chip" data-val="both English and Spanish side by side">🇺🇸🇪🇸 Bilingual</div>
-            <div class="opt-chip" data-val="simple English (avoid complex words)">🔤 Simple English</div>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <div class="option-row">
-          <span class="sec-label" style="margin-bottom:0">Extras</span>
-          <div class="toggles-row">
-            <div class="toggle-pill on" data-key="examples"><div class="dot"></div> Include Examples</div>
-            <div class="toggle-pill" data-key="followup"><div class="dot"></div> Follow-up Questions</div>
-            <div class="toggle-pill" data-key="funfact"><div class="dot"></div> Fun Fact</div>
-            <div class="toggle-pill" data-key="summary"><div class="dot"></div> TL;DR Summary</div>
-            <div class="toggle-pill" data-key="mnemonic"><div class="dot"></div> Memory Trick</div>
-            <div class="toggle-pill" data-key="commonmistakes"><div class="dot"></div> Common Mistakes</div>
-          </div>
-        </div>
-
+      <span class="sec-label">Answer Length</span>
+      <div class="opt-chips" id="ask-length">
+        <div class="opt-chip" data-v="1 sentence">1 Sentence</div>
+        <div class="opt-chip" data-v="2-3 sentences">2-3 Sentences</div>
+        <div class="opt-chip active" data-v="a paragraph">Paragraph</div>
+        <div class="opt-chip" data-v="detailed and thorough">Detailed</div>
+        <div class="opt-chip" data-v="as comprehensive as possible">Deep Dive</div>
       </div>
     </div>
 
-    <!-- Question input -->
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <span class="sec-label">Your Question</span>
-      <textarea id="question-input" placeholder="Type your question here… e.g. ¿Cómo se usa el subjuntivo?"></textarea>
-      <button class="action-btn" id="ask-btn">
-        <span id="btn-text">Ask</span>
-        <span id="btn-icon">→</span>
-        <div class="spinner" id="spinner"></div>
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Format</span>
+        <div class="opt-chips" id="ask-format">
+          <div class="opt-chip active" data-v="paragraph">📄 Paragraph</div>
+          <div class="opt-chip" data-v="bullet points">• Bullets</div>
+          <div class="opt-chip" data-v="numbered steps">1. Steps</div>
+          <div class="opt-chip" data-v="a structured outline with headers">📋 Outline</div>
+          <div class="opt-chip" data-v="a table">📊 Table</div>
+          <div class="opt-chip" data-v="a story or narrative">📖 Story</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Difficulty</span>
+        <div class="opt-chips" id="ask-difficulty">
+          <div class="opt-chip" data-v="a 5 year old">🧒 5yr</div>
+          <div class="opt-chip" data-v="an elementary student">🎒 Elem</div>
+          <div class="opt-chip active" data-v="a middle school student">📚 Middle</div>
+          <div class="opt-chip" data-v="a high school student">🏫 HS</div>
+          <div class="opt-chip" data-v="a college student">🎓 College</div>
+          <div class="opt-chip" data-v="an expert">🔬 Expert</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Tone</span>
+        <div class="opt-chips" id="ask-tone">
+          <div class="opt-chip active" data-v="friendly">😊 Friendly</div>
+          <div class="opt-chip" data-v="professional">👔 Pro</div>
+          <div class="opt-chip" data-v="casual">💬 Casual</div>
+          <div class="opt-chip" data-v="enthusiastic">⚡ Hyped</div>
+          <div class="opt-chip" data-v="strict and no-nonsense">📏 Strict</div>
+          <div class="opt-chip" data-v="funny and humorous">😄 Funny</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Language</span>
+        <div class="opt-chips" id="ask-language">
+          <div class="opt-chip active" data-v="English">🇺🇸 English</div>
+          <div class="opt-chip" data-v="Spanish">🇪🇸 Spanish</div>
+          <div class="opt-chip" data-v="both English and Spanish">🇺🇸🇪🇸 Both</div>
+          <div class="opt-chip" data-v="simple English">🔤 Simple</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Extras</span>
+      <div class="toggles-row" id="ask-extras">
+        <div class="toggle-pill on" data-k="examples"><div class="dot"></div>Examples</div>
+        <div class="toggle-pill" data-k="followup"><div class="dot"></div>Follow-up ?s</div>
+        <div class="toggle-pill" data-k="funfact"><div class="dot"></div>Fun Fact</div>
+        <div class="toggle-pill" data-k="tldr"><div class="dot"></div>TL;DR</div>
+        <div class="toggle-pill" data-k="mnemonic"><div class="dot"></div>Memory Trick</div>
+        <div class="toggle-pill" data-k="mistakes"><div class="dot"></div>Common Mistakes</div>
+        <div class="toggle-pill" data-k="analogy"><div class="dot"></div>Analogy</div>
+        <div class="toggle-pill" data-k="quiz"><div class="dot"></div>Quick Quiz Me</div>
+      </div>
+    </div>
+
+    <textarea id="ask-q" placeholder="Type your question… e.g. What is the difference between ser and estar?"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-purple" id="ask-btn">
+        <span id="ask-btn-txt">Ask</span><span id="ask-btn-icon">→</span><div class="spinner" id="ask-spin"></div>
       </button>
     </div>
+  </div></div>
 
-    <!-- Answer output -->
-    <div class="output-section" id="answer-section">
-      <div class="answer-card">
-        <div class="answer-header">
-          <span>Answer</span>
-          <span class="badge" id="badge-topic">Spanish</span>
-          <span class="badge blue" id="badge-format">Paragraph</span>
-          <span class="badge green" id="badge-level">Middle School</span>
-          <button class="copy-btn" id="copy-btn">Copy</button>
-        </div>
-        <div class="answer-body" id="answer-body"></div>
-      </div>
+  <div class="output-card" id="ask-out">
+    <div class="output-header">
+      <span>Answer</span>
+      <span class="badge badge-purple" id="ask-badge1">Topic</span>
+      <span class="badge badge-blue" id="ask-badge2">Format</span>
+      <span class="badge badge-green" id="ask-badge3">Level</span>
+      <button class="copy-btn" data-target="ask-out-body">Copy</button>
     </div>
+    <div class="output-body" id="ask-out-body"></div>
+  </div>
+</div>
 
-  </div><!-- /ask-mode -->
 
+<!-- ═══════════════════════════════════════════ QUIZ ═══ -->
+<div class="section" id="sec-quiz">
+  <div class="section-title">📝 Practice Quiz Generator</div>
+  <div class="section-desc">Generate customized practice questions for any subject.</div>
 
-  <!-- ════════════════════════════════════════
-       GENERATE MODE
-  ════════════════════════════════════════ -->
-  <div id="gen-mode" style="display:none; flex-direction:column; gap:20px;">
-
-    <!-- Topic -->
+  <div class="card"><div class="card-body">
     <div>
       <span class="sec-label">Subject</span>
-      <div class="chips" id="gen-topic-chips">
-        <div class="chip active" data-topic="Spanish">🇪🇸 Spanish</div>
-        <div class="chip" data-topic="Language Arts">✏️ Language Arts</div>
-        <div class="chip" data-topic="Math">🔢 Math</div>
-        <div class="chip" data-topic="Science">🔬 Science</div>
-        <div class="chip" data-topic="History">🏛️ History</div>
-        <div class="chip" data-topic="Grammar">📖 Grammar</div>
-        <div class="chip" data-topic="Writing">🖊️ Writing</div>
-        <div class="chip" data-topic="Geography">🌍 Geography</div>
-        <div class="chip" data-topic="Biology">🧬 Biology</div>
-        <div class="chip" data-topic="custom">✨ Other...</div>
+      <div class="chips" id="quiz-topic-chips">
+        <div class="chip active" data-t="Math">🔢 Math</div>
+        <div class="chip" data-t="Spanish">🇪🇸 Spanish</div>
+        <div class="chip" data-t="Science">🔬 Science</div>
+        <div class="chip" data-t="History">🏛️ History</div>
+        <div class="chip" data-t="Language Arts">✏️ Language Arts</div>
+        <div class="chip" data-t="Biology">🧬 Biology</div>
+        <div class="chip" data-t="Chemistry">⚗️ Chemistry</div>
+        <div class="chip" data-t="Physics">⚡ Physics</div>
+        <div class="chip" data-t="Geography">🌍 Geography</div>
+        <div class="chip" data-t="Literature">📕 Literature</div>
+        <div class="chip" data-t="Economics">💰 Economics</div>
+        <div class="chip" data-t="custom">✨ Other</div>
       </div>
-      <div style="margin-top:8px; display:none;" id="gen-custom-wrap">
-        <input id="gen-custom-topic" type="text" placeholder="Type your subject…" />
-      </div>
+      <input class="text-input" id="quiz-custom-topic" style="display:none;margin-top:8px;max-width:240px" placeholder="Your subject…" />
     </div>
 
-    <!-- Specific topic field -->
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <span class="sec-label">Specific Topic / Chapter <span style="color:#475569;text-transform:none;font-size:0.75rem;">(optional)</span></span>
-      <input class="text-input" id="gen-subtopic" type="text" placeholder="e.g. Pythagorean theorem, Civil War, subjunctive tense…" />
-    </div>
+    <input class="text-input" id="quiz-subtopic" placeholder="Specific topic/chapter (optional) — e.g. Quadratic equations, World War II…" />
 
-    <!-- Question type -->
-    <div class="option-row">
-      <span class="sec-label" style="margin-bottom:0">Question Type</span>
-      <div class="opt-chips" id="qtype-chips">
-        <div class="opt-chip active" data-val="multiple choice (with 4 options labeled A, B, C, D)">🔘 Multiple Choice</div>
-        <div class="opt-chip" data-val="true or false">✅ True / False</div>
-        <div class="opt-chip" data-val="fill in the blank">___ Fill in the Blank</div>
-        <div class="opt-chip" data-val="short answer">✏️ Short Answer</div>
-        <div class="opt-chip" data-val="word problems">🔢 Word Problems</div>
-        <div class="opt-chip" data-val="essay prompts">📄 Essay Prompts</div>
-        <div class="opt-chip" data-val="matching">🔗 Matching</div>
-        <div class="opt-chip" data-val="mixed types">🎲 Mixed Types</div>
-      </div>
-    </div>
-
-    <!-- Number of questions -->
-    <div class="option-row">
-      <span class="sec-label" style="margin-bottom:0">Number of Questions</span>
-      <div class="opt-chips" id="qcount-chips">
-        <div class="opt-chip" data-val="3">3</div>
-        <div class="opt-chip" data-val="5">5</div>
-        <div class="opt-chip active" data-val="10">10</div>
-        <div class="opt-chip" data-val="15">15</div>
-        <div class="opt-chip" data-val="20">20</div>
-        <div class="opt-chip" data-val="custom">Custom</div>
-      </div>
-      <div class="custom-length-wrap" id="custom-qcount-wrap">
-        <input type="number" class="num-input" id="custom-qcount" placeholder="25" min="1" max="50" />
-        <span>questions</span>
-      </div>
-    </div>
-
-    <!-- Difficulty -->
-    <div class="option-row">
-      <span class="sec-label" style="margin-bottom:0">Difficulty</span>
-      <div class="opt-chips" id="gen-difficulty-chips">
-        <div class="opt-chip" data-val="elementary school">🎒 Elementary</div>
-        <div class="opt-chip active" data-val="middle school">📚 Middle School</div>
-        <div class="opt-chip" data-val="high school">🏫 High School</div>
-        <div class="opt-chip" data-val="college">🎓 College</div>
-        <div class="opt-chip" data-val="advanced/expert">🔬 Expert</div>
-      </div>
-    </div>
-
-    <!-- Extras -->
-    <div class="option-row">
-      <span class="sec-label" style="margin-bottom:0">Options</span>
-      <div class="toggles-row">
-        <div class="toggle-pill on" data-gkey="answerkey"><div class="dot"></div> Include Answer Key</div>
-        <div class="toggle-pill" data-gkey="hints"><div class="dot"></div> Include Hints</div>
-        <div class="toggle-pill" data-gkey="explanations"><div class="dot"></div> Explain Each Answer</div>
-        <div class="toggle-pill" data-gkey="numbered"><div class="dot"></div> Number the Questions</div>
-        <div class="toggle-pill on" data-gkey="varied"><div class="dot"></div> Vary Difficulty</div>
-      </div>
-    </div>
-
-    <button class="action-btn green" id="gen-btn">
-      <span id="gen-btn-text">Generate Questions</span>
-      <span id="gen-btn-icon">→</span>
-      <div class="spinner" id="gen-spinner"></div>
-    </button>
-
-    <!-- Generated output -->
-    <div class="output-section" id="gen-output-section">
-      <div class="answer-card">
-        <div class="answer-header">
-          <span>Practice Questions</span>
-          <span class="badge" id="gen-badge-topic">Math</span>
-          <span class="badge orange" id="gen-badge-type">Multiple Choice</span>
-          <span class="badge green" id="gen-badge-level">Middle School</span>
-          <button class="copy-btn" id="gen-copy-btn">Copy</button>
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Question Type</span>
+        <div class="opt-chips" id="quiz-type">
+          <div class="opt-chip active" data-v="multiple choice (4 options A B C D)">🔘 Multiple Choice</div>
+          <div class="opt-chip" data-v="true or false">✅ True/False</div>
+          <div class="opt-chip" data-v="fill in the blank">___ Fill Blank</div>
+          <div class="opt-chip" data-v="short answer">✏️ Short Answer</div>
+          <div class="opt-chip" data-v="word problems">🔢 Word Problems</div>
+          <div class="opt-chip" data-v="essay prompts">📄 Essay</div>
+          <div class="opt-chip" data-v="matching pairs">🔗 Matching</div>
+          <div class="opt-chip" data-v="mixed types">🎲 Mixed</div>
         </div>
-        <div class="answer-body" id="gen-output-body"></div>
+      </div>
+      <div>
+        <span class="sec-label">Difficulty</span>
+        <div class="opt-chips" id="quiz-difficulty">
+          <div class="opt-chip" data-v="elementary school">🎒 Elementary</div>
+          <div class="opt-chip active" data-v="middle school">📚 Middle</div>
+          <div class="opt-chip" data-v="high school">🏫 High School</div>
+          <div class="opt-chip" data-v="college">🎓 College</div>
+          <div class="opt-chip" data-v="expert">🔬 Expert</div>
+        </div>
       </div>
     </div>
 
-  </div><!-- /gen-mode -->
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Number of Questions</span>
+        <div class="opt-chips" id="quiz-count">
+          <div class="opt-chip" data-v="5">5</div>
+          <div class="opt-chip active" data-v="10">10</div>
+          <div class="opt-chip" data-v="15">15</div>
+          <div class="opt-chip" data-v="20">20</div>
+          <div class="opt-chip" data-v="25">25</div>
+          <div class="opt-chip" data-v="30">30</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Options</span>
+        <div class="toggles-row" id="quiz-extras">
+          <div class="toggle-pill on" data-k="answerkey"><div class="dot"></div>Answer Key</div>
+          <div class="toggle-pill" data-k="hints"><div class="dot"></div>Hints</div>
+          <div class="toggle-pill" data-k="explain"><div class="dot"></div>Explanations</div>
+          <div class="toggle-pill on" data-k="varied"><div class="dot"></div>Vary Difficulty</div>
+          <div class="toggle-pill" data-k="realworld"><div class="dot"></div>Real-World Context</div>
+        </div>
+      </div>
+    </div>
 
+    <div class="btn-row">
+      <button class="btn btn-teal" id="quiz-btn">
+        <span id="quiz-btn-txt">Generate Quiz</span><span>→</span><div class="spinner" id="quiz-spin"></div>
+      </button>
+    </div>
+  </div></div>
 
-  <!-- History (shared) -->
-  <div id="history-section" style="display:none;">
-    <h2>Recent</h2>
-    <div class="history-list" id="history-list"></div>
+  <div class="output-card" id="quiz-out">
+    <div class="output-header">
+      <span>Practice Quiz</span>
+      <span class="badge badge-purple" id="quiz-badge1">Math</span>
+      <span class="badge badge-orange" id="quiz-badge2">Multiple Choice</span>
+      <span class="badge badge-green" id="quiz-badge3">Middle School</span>
+      <button class="copy-btn" data-target="quiz-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="quiz-out-body"></div>
   </div>
+</div>
 
-</main>
 
-<footer>Ask Anything · Your personal study assistant</footer>
+<!-- ═══════════════════════════════════════════ FLASHCARDS ═══ -->
+<div class="section" id="sec-flashcards">
+  <div class="section-title">🃏 Flashcard Generator</div>
+  <div class="section-desc">Generate a set of flashcards for any topic. Click each card to reveal the answer.</div>
+
+  <div class="card"><div class="card-body">
+    <div>
+      <span class="sec-label">Subject</span>
+      <div class="chips" id="fc-topic-chips">
+        <div class="chip active" data-t="Spanish Vocabulary">🇪🇸 Spanish Vocab</div>
+        <div class="chip" data-t="Spanish Verbs">🇪🇸 Spanish Verbs</div>
+        <div class="chip" data-t="Math Formulas">🔢 Math Formulas</div>
+        <div class="chip" data-t="Science Terms">🔬 Science</div>
+        <div class="chip" data-t="History Events">🏛️ History</div>
+        <div class="chip" data-t="Biology Terms">🧬 Biology</div>
+        <div class="chip" data-t="Chemistry">⚗️ Chemistry</div>
+        <div class="chip" data-t="Geography">🌍 Geography</div>
+        <div class="chip" data-t="Literature Terms">📕 Literature</div>
+        <div class="chip" data-t="Economics Terms">💰 Economics</div>
+        <div class="chip" data-t="custom">✨ Other</div>
+      </div>
+      <input class="text-input" id="fc-custom-topic" style="display:none;margin-top:8px;max-width:240px" placeholder="Your topic…" />
+    </div>
+
+    <input class="text-input" id="fc-subtopic" placeholder="Specific focus (optional) — e.g. irregular verbs, photosynthesis…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Number of Cards</span>
+        <div class="opt-chips" id="fc-count">
+          <div class="opt-chip" data-v="10">10</div>
+          <div class="opt-chip active" data-v="20">20</div>
+          <div class="opt-chip" data-v="30">30</div>
+          <div class="opt-chip" data-v="40">40</div>
+          <div class="opt-chip" data-v="50">50</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Card Style</span>
+        <div class="opt-chips" id="fc-style">
+          <div class="opt-chip active" data-v="term and definition">Term → Definition</div>
+          <div class="opt-chip" data-v="question and answer">Question → Answer</div>
+          <div class="opt-chip" data-v="word and translation">Word → Translation</div>
+          <div class="opt-chip" data-v="concept and example">Concept → Example</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Options</span>
+      <div class="toggles-row" id="fc-extras">
+        <div class="toggle-pill on" data-k="examples"><div class="dot"></div>Include Example</div>
+        <div class="toggle-pill" data-k="mnemonic"><div class="dot"></div>Memory Trick</div>
+        <div class="toggle-pill" data-k="difficulty"><div class="dot"></div>Mark Difficulty</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-orange" id="fc-btn">
+        <span id="fc-btn-txt">Generate Flashcards</span><span>→</span><div class="spinner" id="fc-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div id="fc-output" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:0.8rem;color:var(--muted2)">Click a card to flip it</span>
+      <button class="copy-btn" style="margin-left:0" data-target="fc-raw">Copy All</button>
+    </div>
+    <div class="flashcard-grid" id="fc-grid"></div>
+    <div id="fc-raw" style="display:none"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ STUDY GUIDE ═══ -->
+<div class="section" id="sec-studyguide">
+  <div class="section-title">📖 Study Guide Generator</div>
+  <div class="section-desc">Generate a complete, structured study guide for any topic or exam.</div>
+
+  <div class="card"><div class="card-body">
+    <div>
+      <span class="sec-label">Subject</span>
+      <div class="chips" id="sg-topic-chips">
+        <div class="chip active" data-t="Spanish">🇪🇸 Spanish</div>
+        <div class="chip" data-t="Math">🔢 Math</div>
+        <div class="chip" data-t="Science">🔬 Science</div>
+        <div class="chip" data-t="History">🏛️ History</div>
+        <div class="chip" data-t="Biology">🧬 Biology</div>
+        <div class="chip" data-t="Chemistry">⚗️ Chemistry</div>
+        <div class="chip" data-t="Physics">⚡ Physics</div>
+        <div class="chip" data-t="Literature">📕 Literature</div>
+        <div class="chip" data-t="custom">✨ Other</div>
+      </div>
+      <input class="text-input" id="sg-custom-topic" style="display:none;margin-top:8px;max-width:240px" placeholder="Your subject…" />
+    </div>
+
+    <input class="text-input" id="sg-unit" placeholder="Unit, chapter, or specific topic — e.g. Chapter 5: The Civil War, Algebra Unit 3…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Guide Type</span>
+        <div class="opt-chips" id="sg-type">
+          <div class="opt-chip active" data-v="comprehensive study guide">📖 Full Study Guide</div>
+          <div class="opt-chip" data-v="quick review cheat sheet">⚡ Cheat Sheet</div>
+          <div class="opt-chip" data-v="exam prep review">🎯 Exam Prep</div>
+          <div class="opt-chip" data-v="concept summary">📋 Summary</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Level</span>
+        <div class="opt-chips" id="sg-difficulty">
+          <div class="opt-chip" data-v="elementary">🎒 Elem</div>
+          <div class="opt-chip active" data-v="middle school">📚 Middle</div>
+          <div class="opt-chip" data-v="high school">🏫 HS</div>
+          <div class="opt-chip" data-v="college">🎓 College</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Include</span>
+      <div class="toggles-row" id="sg-extras">
+        <div class="toggle-pill on" data-k="keyconcepts"><div class="dot"></div>Key Concepts</div>
+        <div class="toggle-pill on" data-k="definitions"><div class="dot"></div>Definitions</div>
+        <div class="toggle-pill on" data-k="examples"><div class="dot"></div>Examples</div>
+        <div class="toggle-pill" data-k="formulas"><div class="dot"></div>Formulas</div>
+        <div class="toggle-pill" data-k="tips"><div class="dot"></div>Study Tips</div>
+        <div class="toggle-pill" data-k="practice"><div class="dot"></div>Practice ?s</div>
+        <div class="toggle-pill" data-k="common"><div class="dot"></div>Common Mistakes</div>
+        <div class="toggle-pill" data-k="summary"><div class="dot"></div>Summary at End</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-blue" id="sg-btn">
+        <span id="sg-btn-txt">Generate Study Guide</span><span>→</span><div class="spinner" id="sg-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="sg-out">
+    <div class="output-header">
+      <span>Study Guide</span>
+      <span class="badge badge-purple" id="sg-badge1">Subject</span>
+      <span class="badge badge-blue" id="sg-badge2">Type</span>
+      <button class="copy-btn" data-target="sg-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="sg-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ ESSAY ═══ -->
+<div class="section" id="sec-essay">
+  <div class="section-title">✍️ Essay Helper</div>
+  <div class="section-desc">Get help with any part of your essay — outline, thesis, introduction, body, or conclusion.</div>
+
+  <div class="card"><div class="card-body">
+    <div>
+      <span class="sec-label">What do you need help with?</span>
+      <div class="opt-chips" id="essay-mode">
+        <div class="opt-chip active" data-v="outline">📋 Full Outline</div>
+        <div class="opt-chip" data-v="thesis statement">🎯 Thesis Statement</div>
+        <div class="opt-chip" data-v="introduction paragraph">🚪 Introduction</div>
+        <div class="opt-chip" data-v="body paragraphs">📄 Body Paragraphs</div>
+        <div class="opt-chip" data-v="conclusion paragraph">🔚 Conclusion</div>
+        <div class="opt-chip" data-v="improve and rewrite">✨ Improve My Essay</div>
+        <div class="opt-chip" data-v="topic sentence for each paragraph">📌 Topic Sentences</div>
+        <div class="opt-chip" data-v="transitions between paragraphs">🔗 Transitions</div>
+        <div class="opt-chip" data-v="evidence and examples">📚 Evidence/Examples</div>
+        <div class="opt-chip" data-v="counterargument">⚖️ Counterargument</div>
+      </div>
+    </div>
+
+    <input class="text-input" id="essay-topic" placeholder="Essay topic or prompt — e.g. The causes of World War I, Should school uniforms be required?" />
+
+    <textarea id="essay-existing" placeholder="Paste your existing essay or notes here (optional — leave blank to start from scratch)…" style="min-height:120px"></textarea>
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Essay Type</span>
+        <div class="opt-chips" id="essay-type">
+          <div class="opt-chip active" data-v="argumentative">Argumentative</div>
+          <div class="opt-chip" data-v="expository">Expository</div>
+          <div class="opt-chip" data-v="narrative">Narrative</div>
+          <div class="opt-chip" data-v="descriptive">Descriptive</div>
+          <div class="opt-chip" data-v="compare and contrast">Compare & Contrast</div>
+          <div class="opt-chip" data-v="persuasive">Persuasive</div>
+          <div class="opt-chip" data-v="analytical">Analytical</div>
+          <div class="opt-chip" data-v="research">Research</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Length / Level</span>
+        <div class="opt-chips" id="essay-level">
+          <div class="opt-chip" data-v="middle school">📚 Middle</div>
+          <div class="opt-chip active" data-v="high school">🏫 High School</div>
+          <div class="opt-chip" data-v="college">🎓 College</div>
+          <div class="opt-chip" data-v="a 5 paragraph essay">5 Paragraphs</div>
+          <div class="opt-chip" data-v="a short 3 paragraph essay">3 Paragraphs</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-pink" id="essay-btn">
+        <span id="essay-btn-txt">Help With Essay</span><span>→</span><div class="spinner" id="essay-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="essay-out">
+    <div class="output-header">
+      <span>Essay Help</span>
+      <span class="badge badge-pink" id="essay-badge">Outline</span>
+      <button class="copy-btn" data-target="essay-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="essay-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ VOCAB ═══ -->
+<div class="section" id="sec-vocab">
+  <div class="section-title">📚 Vocabulary Builder</div>
+  <div class="section-desc">Generate vocabulary lists with definitions, examples, and memory tips.</div>
+
+  <div class="card"><div class="card-body">
+    <div>
+      <span class="sec-label">Language / Subject</span>
+      <div class="chips" id="vocab-topic-chips">
+        <div class="chip active" data-t="Spanish">🇪🇸 Spanish</div>
+        <div class="chip" data-t="English">🇺🇸 English</div>
+        <div class="chip" data-t="Science">🔬 Science</div>
+        <div class="chip" data-t="Biology">🧬 Biology</div>
+        <div class="chip" data-t="Chemistry">⚗️ Chemistry</div>
+        <div class="chip" data-t="History">🏛️ History</div>
+        <div class="chip" data-t="Literature">📕 Literature</div>
+        <div class="chip" data-t="Math">🔢 Math</div>
+        <div class="chip" data-t="custom">✨ Other</div>
+      </div>
+      <input class="text-input" id="vocab-custom" style="display:none;margin-top:8px;max-width:240px" placeholder="Your language/subject…" />
+    </div>
+
+    <input class="text-input" id="vocab-focus" placeholder="Topic or theme — e.g. food, travel, emotions, cell biology, the American Revolution…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Number of Words</span>
+        <div class="opt-chips" id="vocab-count">
+          <div class="opt-chip" data-v="10">10</div>
+          <div class="opt-chip active" data-v="20">20</div>
+          <div class="opt-chip" data-v="30">30</div>
+          <div class="opt-chip" data-v="50">50</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Level</span>
+        <div class="opt-chips" id="vocab-level">
+          <div class="opt-chip" data-v="beginner">🌱 Beginner</div>
+          <div class="opt-chip active" data-v="intermediate">📚 Intermediate</div>
+          <div class="opt-chip" data-v="advanced">🔬 Advanced</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Include</span>
+      <div class="toggles-row" id="vocab-extras">
+        <div class="toggle-pill on" data-k="definition"><div class="dot"></div>Definition</div>
+        <div class="toggle-pill on" data-k="example"><div class="dot"></div>Example Sentence</div>
+        <div class="toggle-pill" data-k="pronunciation"><div class="dot"></div>Pronunciation</div>
+        <div class="toggle-pill" data-k="synonyms"><div class="dot"></div>Synonyms</div>
+        <div class="toggle-pill" data-k="antonyms"><div class="dot"></div>Antonyms</div>
+        <div class="toggle-pill" data-k="mnemonic"><div class="dot"></div>Memory Trick</div>
+        <div class="toggle-pill" data-k="partOfSpeech"><div class="dot"></div>Part of Speech</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-purple" id="vocab-btn">
+        <span id="vocab-btn-txt">Build Vocabulary List</span><span>→</span><div class="spinner" id="vocab-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="vocab-out">
+    <div class="output-header">
+      <span>Vocabulary List</span>
+      <span class="badge badge-purple" id="vocab-badge">Spanish</span>
+      <button class="copy-btn" data-target="vocab-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="vocab-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ MATH ═══ -->
+<div class="section" id="sec-math">
+  <div class="section-title">🔢 Math Problem Solver</div>
+  <div class="section-desc">Solve any math problem with full step-by-step work shown.</div>
+
+  <div class="card"><div class="card-body">
+    <div>
+      <span class="sec-label">Math Type</span>
+      <div class="chips" id="math-type-chips">
+        <div class="chip active" data-t="any math">🔢 Any Math</div>
+        <div class="chip" data-t="Arithmetic">➕ Arithmetic</div>
+        <div class="chip" data-t="Algebra">📐 Algebra</div>
+        <div class="chip" data-t="Geometry">📏 Geometry</div>
+        <div class="chip" data-t="Trigonometry">📐 Trig</div>
+        <div class="chip" data-t="Pre-Calculus">📊 Pre-Calc</div>
+        <div class="chip" data-t="Calculus">∫ Calculus</div>
+        <div class="chip" data-t="Statistics">📈 Statistics</div>
+        <div class="chip" data-t="Word Problems">💬 Word Problems</div>
+        <div class="chip" data-t="Fractions and Decimals">🔣 Fractions</div>
+      </div>
+    </div>
+
+    <textarea id="math-problem" placeholder="Type your math problem here…&#10;e.g. Solve for x: 3x² + 5x - 2 = 0&#10;e.g. Find the area of a triangle with base 8 and height 5&#10;e.g. A train travels 60mph for 2.5 hours. How far does it go?" style="min-height:110px"></textarea>
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Output Style</span>
+        <div class="opt-chips" id="math-style">
+          <div class="opt-chip active" data-v="full step-by-step solution with explanations">📋 Full Steps</div>
+          <div class="opt-chip" data-v="step-by-step with formulas highlighted">📐 With Formulas</div>
+          <div class="opt-chip" data-v="just the answer with brief explanation">⚡ Quick Answer</div>
+          <div class="opt-chip" data-v="multiple methods if possible">🔀 Multiple Methods</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Extras</span>
+        <div class="toggles-row" id="math-extras">
+          <div class="toggle-pill on" data-k="check"><div class="dot"></div>Check Answer</div>
+          <div class="toggle-pill" data-k="graph"><div class="dot"></div>Describe Graph</div>
+          <div class="toggle-pill" data-k="similar"><div class="dot"></div>Similar Practice Problem</div>
+          <div class="toggle-pill" data-k="concept"><div class="dot"></div>Explain the Concept</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-blue" id="math-btn">
+        <span id="math-btn-txt">Solve Problem</span><span>→</span><div class="spinner" id="math-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="math-out">
+    <div class="output-header">
+      <span>Solution</span>
+      <span class="badge badge-blue" id="math-badge">Algebra</span>
+      <button class="copy-btn" data-target="math-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="math-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ TRANSLATE ═══ -->
+<div class="section" id="sec-translate">
+  <div class="section-title">🌐 Translator</div>
+  <div class="section-desc">Translate text between languages with grammar notes and pronunciation tips.</div>
+
+  <div class="card"><div class="card-body">
+    <div class="two-col">
+      <div>
+        <span class="sec-label">From</span>
+        <div class="opt-chips" id="trans-from">
+          <div class="opt-chip active" data-v="English">🇺🇸 English</div>
+          <div class="opt-chip" data-v="Spanish">🇪🇸 Spanish</div>
+          <div class="opt-chip" data-v="French">🇫🇷 French</div>
+          <div class="opt-chip" data-v="Portuguese">🇧🇷 Portuguese</div>
+          <div class="opt-chip" data-v="German">🇩🇪 German</div>
+          <div class="opt-chip" data-v="Italian">🇮🇹 Italian</div>
+          <div class="opt-chip" data-v="any language">🌐 Auto</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">To</span>
+        <div class="opt-chips" id="trans-to">
+          <div class="opt-chip" data-v="English">🇺🇸 English</div>
+          <div class="opt-chip active" data-v="Spanish">🇪🇸 Spanish</div>
+          <div class="opt-chip" data-v="French">🇫🇷 French</div>
+          <div class="opt-chip" data-v="Portuguese">🇧🇷 Portuguese</div>
+          <div class="opt-chip" data-v="German">🇩🇪 German</div>
+          <div class="opt-chip" data-v="Italian">🇮🇹 Italian</div>
+        </div>
+      </div>
+    </div>
+
+    <textarea id="trans-text" placeholder="Enter text to translate…" style="min-height:110px"></textarea>
+
+    <div>
+      <span class="sec-label">Extras</span>
+      <div class="toggles-row" id="trans-extras">
+        <div class="toggle-pill on" data-k="pronunciation"><div class="dot"></div>Pronunciation Guide</div>
+        <div class="toggle-pill" data-k="grammar"><div class="dot"></div>Grammar Notes</div>
+        <div class="toggle-pill" data-k="formal"><div class="dot"></div>Formal vs Informal</div>
+        <div class="toggle-pill" data-k="literal"><div class="dot"></div>Literal Translation</div>
+        <div class="toggle-pill" data-k="alternatives"><div class="dot"></div>Alternative Translations</div>
+        <div class="toggle-pill" data-k="cultural"><div class="dot"></div>Cultural Context</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-purple" id="trans-btn">
+        <span id="trans-btn-txt">Translate</span><span>→</span><div class="spinner" id="trans-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="trans-out">
+    <div class="output-header">
+      <span>Translation</span>
+      <span class="badge badge-blue" id="trans-badge">EN → ES</span>
+      <button class="copy-btn" data-target="trans-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="trans-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ GRAMMAR ═══ -->
+<div class="section" id="sec-grammar">
+  <div class="section-title">✅ Grammar Checker</div>
+  <div class="section-desc">Check and correct grammar, spelling, and style in any language.</div>
+
+  <div class="card"><div class="card-body">
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Language</span>
+        <div class="opt-chips" id="gram-lang">
+          <div class="opt-chip active" data-v="English">🇺🇸 English</div>
+          <div class="opt-chip" data-v="Spanish">🇪🇸 Spanish</div>
+          <div class="opt-chip" data-v="French">🇫🇷 French</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Check Type</span>
+        <div class="opt-chips" id="gram-type">
+          <div class="opt-chip active" data-v="grammar and spelling">Grammar + Spelling</div>
+          <div class="opt-chip" data-v="grammar only">Grammar Only</div>
+          <div class="opt-chip" data-v="style and clarity">Style & Clarity</div>
+          <div class="opt-chip" data-v="everything including tone and flow">Full Review</div>
+        </div>
+      </div>
+    </div>
+
+    <textarea id="gram-text" placeholder="Paste your text here to check for grammar, spelling, and style errors…" style="min-height:130px"></textarea>
+
+    <div>
+      <span class="sec-label">Options</span>
+      <div class="toggles-row" id="gram-extras">
+        <div class="toggle-pill on" data-k="correct"><div class="dot"></div>Show Corrected Version</div>
+        <div class="toggle-pill on" data-k="explain"><div class="dot"></div>Explain Each Error</div>
+        <div class="toggle-pill" data-k="score"><div class="dot"></div>Grammar Score</div>
+        <div class="toggle-pill" data-k="suggestions"><div class="dot"></div>Style Suggestions</div>
+        <div class="toggle-pill" data-k="rewrite"><div class="dot"></div>Rewrite Improved Version</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-teal" id="gram-btn">
+        <span id="gram-btn-txt">Check Grammar</span><span>→</span><div class="spinner" id="gram-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="gram-out">
+    <div class="output-header">
+      <span>Grammar Check</span>
+      <span class="badge badge-green" id="gram-badge">English</span>
+      <button class="copy-btn" data-target="gram-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="gram-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ SUMMARIZE ═══ -->
+<div class="section" id="sec-summarize">
+  <div class="section-title">📋 Text Summarizer</div>
+  <div class="section-desc">Paste any text — article, chapter, notes — and get a smart summary.</div>
+
+  <div class="card"><div class="card-body">
+    <textarea id="sum-text" placeholder="Paste your text here… article, chapter, notes, paragraph…" style="min-height:150px"></textarea>
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Summary Length</span>
+        <div class="opt-chips" id="sum-length">
+          <div class="opt-chip" data-v="1-2 sentences (a tweet)">Tweet (1-2 sentences)</div>
+          <div class="opt-chip active" data-v="a short paragraph">Short Paragraph</div>
+          <div class="opt-chip" data-v="a detailed paragraph">Detailed Paragraph</div>
+          <div class="opt-chip" data-v="bullet point key takeaways">Bullet Points</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Style</span>
+        <div class="opt-chips" id="sum-style">
+          <div class="opt-chip active" data-v="simple and clear">Simple</div>
+          <div class="opt-chip" data-v="academic">Academic</div>
+          <div class="opt-chip" data-v="for a child">For a Child</div>
+          <div class="opt-chip" data-v="formal">Formal</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Extras</span>
+      <div class="toggles-row" id="sum-extras">
+        <div class="toggle-pill on" data-k="keypoints"><div class="dot"></div>Key Points</div>
+        <div class="toggle-pill" data-k="vocabulary"><div class="dot"></div>Vocabulary List</div>
+        <div class="toggle-pill" data-k="questions"><div class="dot"></div>Comprehension ?s</div>
+        <div class="toggle-pill" data-k="theme"><div class="dot"></div>Main Theme</div>
+        <div class="toggle-pill" data-k="quote"><div class="dot"></div>Best Quote</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-orange" id="sum-btn">
+        <span id="sum-btn-txt">Summarize</span><span>→</span><div class="spinner" id="sum-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="sum-out">
+    <div class="output-header">
+      <span>Summary</span>
+      <button class="copy-btn" data-target="sum-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="sum-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ DEBATE ═══ -->
+<div class="section" id="sec-debate">
+  <div class="section-title">⚖️ Debate Both Sides</div>
+  <div class="section-desc">See both sides of any argument or debate topic, with strong points for each position.</div>
+
+  <div class="card"><div class="card-body">
+    <input class="text-input" id="debate-topic" placeholder="Debate topic — e.g. Should homework be banned? Is social media harmful to teens? Was Columbus a hero or villain?" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Depth</span>
+        <div class="opt-chips" id="debate-depth">
+          <div class="opt-chip" data-v="3 points per side">3 Points Each</div>
+          <div class="opt-chip active" data-v="5 points per side">5 Points Each</div>
+          <div class="opt-chip" data-v="7 detailed points per side">7 Points Each</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Level</span>
+        <div class="opt-chips" id="debate-level">
+          <div class="opt-chip" data-v="middle school">📚 Middle</div>
+          <div class="opt-chip active" data-v="high school">🏫 High School</div>
+          <div class="opt-chip" data-v="college">🎓 College</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span class="sec-label">Extras</span>
+      <div class="toggles-row" id="debate-extras">
+        <div class="toggle-pill on" data-k="evidence"><div class="dot"></div>Evidence & Examples</div>
+        <div class="toggle-pill" data-k="verdict"><div class="dot"></div>Balanced Verdict</div>
+        <div class="toggle-pill" data-k="counterarguments"><div class="dot"></div>Counterarguments</div>
+        <div class="toggle-pill" data-k="quotes"><div class="dot"></div>Famous Quotes</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-pink" id="debate-btn">
+        <span id="debate-btn-txt">Show Both Sides</span><span>→</span><div class="spinner" id="debate-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="debate-out">
+    <div class="output-header">
+      <span>Both Sides</span>
+      <span class="badge badge-pink" id="debate-badge">Topic</span>
+      <button class="copy-btn" data-target="debate-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="debate-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ TIMELINE ═══ -->
+<div class="section" id="sec-timeline">
+  <div class="section-title">📅 Timeline Generator</div>
+  <div class="section-desc">Generate a detailed timeline of events for any historical topic.</div>
+
+  <div class="card"><div class="card-body">
+    <input class="text-input" id="tl-topic" placeholder="Historical topic — e.g. The American Revolution, World War II, The Civil Rights Movement, Ancient Rome…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Detail Level</span>
+        <div class="opt-chips" id="tl-detail">
+          <div class="opt-chip" data-v="10 major events">10 Events</div>
+          <div class="opt-chip active" data-v="15 key events">15 Events</div>
+          <div class="opt-chip" data-v="20 detailed events">20 Events</div>
+          <div class="opt-chip" data-v="25 comprehensive events">25 Events</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Extras</span>
+        <div class="toggles-row" id="tl-extras">
+          <div class="toggle-pill on" data-k="significance"><div class="dot"></div>Why It Mattered</div>
+          <div class="toggle-pill" data-k="people"><div class="dot"></div>Key People</div>
+          <div class="toggle-pill" data-k="context"><div class="dot"></div>Historical Context</div>
+          <div class="toggle-pill" data-k="impact"><div class="dot"></div>Long-Term Impact</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-blue" id="tl-btn">
+        <span id="tl-btn-txt">Generate Timeline</span><span>→</span><div class="spinner" id="tl-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="tl-out">
+    <div class="output-header">
+      <span>Timeline</span>
+      <span class="badge badge-blue" id="tl-badge">Topic</span>
+      <button class="copy-btn" data-target="tl-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="tl-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ ELI5 ═══ -->
+<div class="section" id="sec-explain">
+  <div class="section-title">🔍 Explain Like I'm 5</div>
+  <div class="section-desc">Get any complex topic explained in the simplest way possible, with fun analogies.</div>
+
+  <div class="card"><div class="card-body">
+    <input class="text-input" id="eli5-topic" placeholder="What do you want explained simply? e.g. How does the stock market work? What is DNA? How do black holes form?" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Explain Like I'm a…</span>
+        <div class="opt-chips" id="eli5-age">
+          <div class="opt-chip" data-v="5 year old">🧒 5 Year Old</div>
+          <div class="opt-chip" data-v="10 year old">👦 10 Year Old</div>
+          <div class="opt-chip active" data-v="middle schooler">📚 Middle Schooler</div>
+          <div class="opt-chip" data-v="high schooler with no background in this topic">🏫 High Schooler</div>
+          <div class="opt-chip" data-v="curious adult with no technical background">👤 Adult Beginner</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Style</span>
+        <div class="opt-chips" id="eli5-style">
+          <div class="opt-chip active" data-v="with a fun analogy">🎯 With Analogy</div>
+          <div class="opt-chip" data-v="using a story">📖 As a Story</div>
+          <div class="opt-chip" data-v="using real world examples">🌍 Real Examples</div>
+          <div class="opt-chip" data-v="in the simplest possible words">🔤 Super Simple</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-purple" id="eli5-btn">
+        <span id="eli5-btn-txt">Explain It!</span><span>→</span><div class="spinner" id="eli5-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="eli5-out">
+    <div class="output-header">
+      <span>Simple Explanation</span>
+      <span class="badge badge-purple" id="eli5-badge">Topic</span>
+      <button class="copy-btn" data-target="eli5-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="eli5-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ COMPARE ═══ -->
+<div class="section" id="sec-compare">
+  <div class="section-title">🔀 Compare & Contrast</div>
+  <div class="section-desc">Compare two things side by side — people, concepts, events, theories, or anything else.</div>
+
+  <div class="card"><div class="card-body">
+    <div class="input-row">
+      <input class="text-input" id="cmp-a" placeholder="First thing — e.g. Romeo and Juliet" />
+      <span style="color:var(--muted);font-size:1.2rem;font-weight:700">vs</span>
+      <input class="text-input" id="cmp-b" placeholder="Second thing — e.g. Hamlet" />
+    </div>
+
+    <input class="text-input" id="cmp-context" placeholder="Context / subject (optional) — e.g. Shakespeare tragedies, American presidents, cell types…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Format</span>
+        <div class="opt-chips" id="cmp-format">
+          <div class="opt-chip active" data-v="a side-by-side comparison with clear sections">Side by Side</div>
+          <div class="opt-chip" data-v="a Venn diagram description">Venn Diagram</div>
+          <div class="opt-chip" data-v="a comparison table">Table</div>
+          <div class="opt-chip" data-v="paragraph form">Paragraph</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Depth</span>
+        <div class="opt-chips" id="cmp-depth">
+          <div class="opt-chip" data-v="brief (3 points each)">Brief</div>
+          <div class="opt-chip active" data-v="medium (5 points each)">Medium</div>
+          <div class="opt-chip" data-v="detailed (7+ points each)">Detailed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-teal" id="cmp-btn">
+        <span id="cmp-btn-txt">Compare</span><span>→</span><div class="spinner" id="cmp-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="cmp-out">
+    <div class="output-header">
+      <span>Comparison</span>
+      <span class="badge badge-blue" id="cmp-badge">A vs B</span>
+      <button class="copy-btn" data-target="cmp-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="cmp-out-body"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ MIND MAP ═══ -->
+<div class="section" id="sec-mindmap">
+  <div class="section-title">🧠 Mind Map Builder</div>
+  <div class="section-desc">Generate a structured mind map / concept map for any topic to visualize connections.</div>
+
+  <div class="card"><div class="card-body">
+    <input class="text-input" id="mm-topic" placeholder="Central topic — e.g. Photosynthesis, World War I, The American Dream, Algebra…" />
+
+    <div class="two-col">
+      <div>
+        <span class="sec-label">Depth</span>
+        <div class="opt-chips" id="mm-depth">
+          <div class="opt-chip" data-v="3 main branches with 2 sub-topics each">Shallow (3 branches)</div>
+          <div class="opt-chip active" data-v="5 main branches with 3 sub-topics each">Medium (5 branches)</div>
+          <div class="opt-chip" data-v="7 main branches with 4 sub-topics each">Deep (7 branches)</div>
+        </div>
+      </div>
+      <div>
+        <span class="sec-label">Focus</span>
+        <div class="opt-chips" id="mm-focus">
+          <div class="opt-chip active" data-v="key concepts and connections">Key Concepts</div>
+          <div class="opt-chip" data-v="causes and effects">Cause & Effect</div>
+          <div class="opt-chip" data-v="pros and cons">Pros & Cons</div>
+          <div class="opt-chip" data-v="who, what, when, where, why">5 W's</div>
+          <div class="opt-chip" data-v="categories and subcategories">Categories</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-orange" id="mm-btn">
+        <span id="mm-btn-txt">Build Mind Map</span><span>→</span><div class="spinner" id="mm-spin"></div>
+      </button>
+    </div>
+  </div></div>
+
+  <div class="output-card" id="mm-out">
+    <div class="output-header">
+      <span>Mind Map</span>
+      <span class="badge badge-orange" id="mm-badge">Topic</span>
+      <button class="copy-btn" data-target="mm-out-body">Copy</button>
+    </div>
+    <div class="output-body" id="mm-out-body"></div>
+  </div>
+</div>
+
+
+<!-- History -->
+<div id="history-section" style="display:none">
+  <h2>Recent</h2>
+  <div class="history-list" id="history-list"></div>
+</div>
+
+</div><!-- /app-body -->
+<footer>StudyAI · Your complete AI-powered study assistant</footer>
 
 <script>
-  // ── Shared state ──
-  let mode = 'ask';
-  let askTopic = 'Spanish';
-  let genTopic = 'Spanish';
-  let history  = JSON.parse(localStorage.getItem('qa_history') || '[]');
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+let history = JSON.parse(localStorage.getItem('studyai_history')||'[]');
 
-  const askOpts = {
-    length: 'a paragraph', format: 'paragraph',
-    difficulty: 'a middle school student', tone: 'friendly and encouraging',
-    language: 'English', examples: true, followup: false,
-    funfact: false, summary: false, mnemonic: false,
-    commonmistakes: false, customWords: null
-  };
-
-  const genOpts = {
-    qtype: 'multiple choice (with 4 options labeled A, B, C, D)',
-    qcount: '10', customQcount: null,
-    difficulty: 'middle school',
-    answerkey: true, hints: false,
-    explanations: false, numbered: true, varied: true
-  };
-
-  // ── Mode switch ──
-  document.getElementById('mode-ask').addEventListener('click', () => setMode('ask'));
-  document.getElementById('mode-gen').addEventListener('click', () => setMode('gen'));
-
-  function setMode(m) {
-    mode = m;
-    document.getElementById('mode-ask').classList.toggle('active', m === 'ask');
-    document.getElementById('mode-gen').classList.toggle('active', m === 'gen');
-    document.getElementById('ask-mode').style.display = m === 'ask' ? 'flex' : 'none';
-    document.getElementById('ask-mode').style.flexDirection = 'column';
-    document.getElementById('ask-mode').style.gap = '20px';
-    document.getElementById('gen-mode').style.display = m === 'gen' ? 'flex' : 'none';
-  }
-
-  // ── Topic chips (ask) ──
-  setupTopicChips('ask-topic-chips', 'custom-wrap', 'custom-topic', v => askTopic = v);
-
-  // ── Topic chips (gen) ──
-  setupTopicChips('gen-topic-chips', 'gen-custom-wrap', 'gen-custom-topic', v => genTopic = v);
-
-  function setupTopicChips(chipsId, wrapId, inputId, setter) {
-    const container = document.getElementById(chipsId);
-    const wrap = document.getElementById(wrapId);
-    const input = document.getElementById(inputId);
-    container.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        if (chip.dataset.topic === 'custom') {
-          wrap.style.display = 'block';
-          input.focus();
-          setter(input.value.trim() || 'General');
-        } else {
-          wrap.style.display = 'none';
-          setter(chip.dataset.topic);
-        }
-      });
-    });
-    input.addEventListener('input', () => setter(input.value.trim() || 'General'));
-  }
-
-  // ── Customize toggle (ask) ──
-  document.getElementById('customize-toggle').addEventListener('click', () => {
-    document.getElementById('customize-panel').classList.toggle('open');
-    document.getElementById('toggle-arrow').classList.toggle('open');
-  });
-
-  // ── Single-select opt chips ──
-  function setupOptChips(groupId, key, optsObj, onCustom) {
-    document.querySelectorAll(`#${groupId} .opt-chip`).forEach(chip => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll(`#${groupId} .opt-chip`).forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        if (onCustom && chip.dataset.val === 'custom') {
-          onCustom(true);
-        } else {
-          if (onCustom) onCustom(false);
-          optsObj[key] = chip.dataset.val;
-        }
-      });
-    });
-  }
-
-  setupOptChips('length-chips', 'length', askOpts, show => {
-    document.getElementById('custom-length-wrap').classList.toggle('show', show);
-  });
-  setupOptChips('format-chips', 'format', askOpts);
-  setupOptChips('difficulty-chips', 'difficulty', askOpts);
-  setupOptChips('tone-chips', 'tone', askOpts);
-  setupOptChips('language-chips', 'language', askOpts);
-  document.getElementById('custom-words').addEventListener('input', e => {
-    askOpts.customWords = parseInt(e.target.value) || null;
-  });
-
-  setupOptChips('qtype-chips', 'qtype', genOpts);
-  setupOptChips('qcount-chips', 'qcount', genOpts, show => {
-    document.getElementById('custom-qcount-wrap').classList.toggle('show', show);
-  });
-  setupOptChips('gen-difficulty-chips', 'difficulty', genOpts);
-  document.getElementById('custom-qcount').addEventListener('input', e => {
-    genOpts.customQcount = parseInt(e.target.value) || null;
-  });
-
-  // ── Toggle pills (ask) ──
-  document.querySelectorAll('.toggle-pill[data-key]').forEach(pill => {
-    pill.addEventListener('click', () => {
-      pill.classList.toggle('on');
-      askOpts[pill.dataset.key] = pill.classList.contains('on');
+// Setup single-select opt-chips group
+function setupOpts(groupId, obj, key, onCustom) {
+  document.querySelectorAll(`#${groupId} .opt-chip`).forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll(`#${groupId} .opt-chip`).forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      if (onCustom && c.dataset.v === 'custom') onCustom(true);
+      else { if (onCustom) onCustom(false); if (obj && key) obj[key] = c.dataset.v; }
     });
   });
+}
 
-  // ── Toggle pills (gen) ──
-  document.querySelectorAll('.toggle-pill[data-gkey]').forEach(pill => {
-    pill.addEventListener('click', () => {
-      pill.classList.toggle('on');
-      genOpts[pill.dataset.gkey] = pill.classList.contains('on');
+function getActive(groupId) {
+  const el = document.querySelector(`#${groupId} .opt-chip.active`);
+  return el ? el.dataset.v : '';
+}
+
+// Setup topic chips (uses data-t)
+function setupTopicChips(chipsId, customInputId, setter) {
+  const input = $(customInputId);
+  document.querySelectorAll(`#${chipsId} .chip`).forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll(`#${chipsId} .chip`).forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      if (c.dataset.t === 'custom') {
+        input.style.display = 'block'; input.focus();
+        setter(input.value.trim()||'General');
+      } else {
+        input.style.display = 'none';
+        setter(c.dataset.t);
+      }
     });
   });
+  if (input) input.addEventListener('input', () => setter(input.value.trim()||'General'));
+}
 
-  // ── ASK ──
-  const askBtn  = document.getElementById('ask-btn');
-  const qInput  = document.getElementById('question-input');
+function getActiveTopic(chipsId) {
+  const el = document.querySelector(`#${chipsId} .chip.active`);
+  return el ? (el.dataset.t === 'custom' ? 'General' : el.dataset.t) : '';
+}
 
-  askBtn.addEventListener('click', askQuestion);
-  qInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) askQuestion(); });
-
-  async function askQuestion() {
-    const q = qInput.value.trim();
-    if (!q) { shake(qInput); return; }
-    setLoading('ask', true);
-    document.getElementById('answer-section').style.display = 'none';
-    const lengthVal = askOpts.customWords ? `at most ${askOpts.customWords} words` : askOpts.length;
-    try {
-      const res = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, topic: askTopic, length: lengthVal,
-          format: askOpts.format, difficulty: askOpts.difficulty, tone: askOpts.tone,
-          language: askOpts.language, examples: askOpts.examples, followup: askOpts.followup,
-          funfact: askOpts.funfact, summary: askOpts.summary, mnemonic: askOpts.mnemonic,
-          commonmistakes: askOpts.commonmistakes })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-      document.getElementById('badge-topic').textContent = askTopic;
-      document.getElementById('badge-format').textContent = askOpts.format;
-      document.getElementById('badge-level').textContent = askOpts.difficulty.replace('a ','').replace(' student','');
-      document.getElementById('answer-body').textContent = data.answer;
-      document.getElementById('answer-section').style.display = 'block';
-      document.getElementById('answer-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      saveHistory(q, data.answer, askTopic, 'ask');
-    } catch (err) {
-      showError('answer-body', 'answer-section', err.message);
-    } finally {
-      setLoading('ask', false);
-    }
-  }
-
-  // ── GENERATE ──
-  const genBtn = document.getElementById('gen-btn');
-  genBtn.addEventListener('click', generateQuestions);
-
-  async function generateQuestions() {
-    setLoading('gen', true);
-    document.getElementById('gen-output-section').style.display = 'none';
-    const subtopic = document.getElementById('gen-subtopic').value.trim();
-    const qcount = genOpts.customQcount || genOpts.qcount;
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: genTopic, subtopic, qtype: genOpts.qtype,
-          qcount, difficulty: genOpts.difficulty,
-          answerkey: genOpts.answerkey, hints: genOpts.hints,
-          explanations: genOpts.explanations, numbered: genOpts.numbered,
-          varied: genOpts.varied
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-      document.getElementById('gen-badge-topic').textContent = genTopic;
-      document.getElementById('gen-badge-type').textContent = genOpts.qtype.split('(')[0].trim();
-      document.getElementById('gen-badge-level').textContent = genOpts.difficulty;
-      document.getElementById('gen-output-body').textContent = data.questions;
-      document.getElementById('gen-output-section').style.display = 'block';
-      document.getElementById('gen-output-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      const label = subtopic ? `${genTopic}: ${subtopic}` : genTopic;
-      saveHistory(label, data.questions, genTopic, 'generate');
-    } catch (err) {
-      showError('gen-output-body', 'gen-output-section', err.message);
-    } finally {
-      setLoading('gen', false);
-    }
-  }
-
-  // ── Copy buttons ──
-  setupCopy('copy-btn', 'answer-body');
-  setupCopy('gen-copy-btn', 'gen-output-body');
-  function setupCopy(btnId, bodyId) {
-    document.getElementById(btnId).addEventListener('click', () => {
-      const text = document.getElementById(bodyId).textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById(btnId);
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 1500);
-      });
+// Setup toggle pills
+function getToggles(containerId) {
+  const out = {};
+  document.querySelectorAll(`#${containerId} .toggle-pill`).forEach(p => {
+    const k = p.dataset.k || p.dataset.gk;
+    if (k) out[k] = p.classList.contains('on');
+    p.addEventListener('click', () => {
+      p.classList.toggle('on');
+      if (k) out[k] = p.classList.contains('on');
     });
-  }
+  });
+  return out;
+}
 
-  // ── Helpers ──
-  function setLoading(which, on) {
-    if (which === 'ask') {
-      askBtn.disabled = on;
-      document.getElementById('spinner').style.display = on ? 'block' : 'none';
-      document.getElementById('btn-text').textContent = on ? 'Thinking…' : 'Ask';
-      document.getElementById('btn-icon').style.display = on ? 'none' : 'inline';
-    } else {
-      genBtn.disabled = on;
-      document.getElementById('gen-spinner').style.display = on ? 'block' : 'none';
-      document.getElementById('gen-btn-text').textContent = on ? 'Generating…' : 'Generate Questions';
-      document.getElementById('gen-btn-icon').style.display = on ? 'none' : 'inline';
-    }
-  }
+// Button loading
+function setLoading(prefix, on, label='Generate') {
+  const btn = $(prefix+'-btn');
+  if (!btn) return;
+  btn.disabled = on;
+  const txt = $(prefix+'-btn-txt');
+  if (txt) txt.textContent = on ? 'Working…' : label;
+  const sp = $(prefix+'-spin');
+  if (sp) sp.style.display = on ? 'block' : 'none';
+  const ic = $(prefix+'-btn-icon');
+  if (ic) ic.style.display = on ? 'none' : 'inline';
+}
 
-  function showError(bodyId, sectionId, msg) {
-    document.getElementById(bodyId).innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
-    document.getElementById(sectionId).style.display = 'block';
-  }
+// Show output
+function showOutput(cardId, bodyId, content) {
+  $(bodyId).textContent = content;
+  $(cardId).style.display = 'block';
+  $(cardId).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 
-  function shake(el) { el.style.borderColor = '#ef4444'; setTimeout(() => el.style.borderColor = '', 1000); }
+function showErr(bodyId, cardId, msg) {
+  $(bodyId).innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+  $(cardId).style.display = 'block';
+}
 
-  function saveHistory(q, a, topic, type) {
-    history.unshift({ q, a, topic, type, time: Date.now() });
-    if (history.length > 20) history = history.slice(0, 20);
-    localStorage.setItem('qa_history', JSON.stringify(history));
-    renderHistory();
-  }
+// API call
+async function api(endpoint, payload) {
+  const res = await fetch(endpoint, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error||`Error ${res.status}`);
+  return data;
+}
 
-  function renderHistory() {
-    const sec  = document.getElementById('history-section');
-    const list = document.getElementById('history-list');
-    if (!history.length) { sec.style.display = 'none'; return; }
-    sec.style.display = 'block';
-    list.innerHTML = history.slice(0, 6).map((item, i) => `
-      <div class="history-item" data-index="${i}">
-        <div class="q">${esc(item.q)}</div>
-        <div class="meta">${item.topic} · ${item.type === 'generate' ? '📝 Generated' : '💬 Answer'} · ${timeAgo(item.time)}</div>
-      </div>
-    `).join('');
-    list.querySelectorAll('.history-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const item = history[+el.dataset.index];
-        if (item.type === 'generate') {
-          setMode('gen');
-          document.getElementById('gen-output-body').textContent = item.a;
-          document.getElementById('gen-output-section').style.display = 'block';
-        } else {
-          setMode('ask');
-          document.getElementById('question-input').value = item.q;
-          document.getElementById('answer-body').textContent = item.a;
-          document.getElementById('answer-section').style.display = 'block';
-        }
-      });
+// History
+function saveHist(label, content, section) {
+  history.unshift({label, content, section, time:Date.now()});
+  if (history.length>30) history = history.slice(0,30);
+  localStorage.setItem('studyai_history', JSON.stringify(history));
+  renderHist();
+}
+function renderHist() {
+  const sec = $('history-section'), list = $('history-list');
+  if (!history.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  list.innerHTML = history.slice(0,8).map((h,i)=>`
+    <div class="history-item" data-i="${i}">
+      <div class="q">${esc(h.label)}</div>
+      <div class="meta">${h.section} · ${timeAgo(h.time)}</div>
+    </div>`).join('');
+  list.querySelectorAll('.history-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const h = history[+el.dataset.i];
+      switchSection(h.section);
     });
-  }
+  });
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function timeAgo(ts){
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
 
-  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function timeAgo(ts) {
-    const s = Math.floor((Date.now() - ts) / 1000);
-    if (s < 60) return 'just now';
-    if (s < 3600) return `${Math.floor(s/60)}m ago`;
-    if (s < 86400) return `${Math.floor(s/3600)}h ago`;
-    return `${Math.floor(s/86400)}d ago`;
-  }
+// Copy buttons
+document.querySelectorAll('.copy-btn[data-target]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const text = $(btn.dataset.target).textContent;
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500);
+    });
+  });
+});
 
-  renderHistory();
+// ══ NAVIGATION ══
+function switchSection(name) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const sec = $('sec-'+name);
+  if (sec) sec.classList.add('active');
+  const tab = document.querySelector(`.nav-tab[data-section="${name}"]`);
+  if (tab) { tab.classList.add('active'); tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
+}
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>switchSection(tab.dataset.section));
+});
+
+// ══════════════════════════════════════════════════
+//  ASK
+// ══════════════════════════════════════════════════
+const askExtras = getToggles('ask-extras');
+$('ask-btn').addEventListener('click', async ()=>{
+  const q = $('ask-q').value.trim();
+  if (!q) { $('ask-q').style.borderColor='#ef4444'; setTimeout(()=>$('ask-q').style.borderColor='',1000); return; }
+  const topic = getActiveTopic('ask-topic-chips') || $('ask-custom-topic').value.trim() || 'General';
+  setLoading('ask', true, 'Ask');
+  $('ask-out').style.display='none';
+  try {
+    const data = await api('/api/ask', {
+      question:q, topic,
+      length: getActive('ask-length'),
+      format: getActive('ask-format'),
+      difficulty: getActive('ask-difficulty'),
+      tone: getActive('ask-tone'),
+      language: getActive('ask-language'),
+      ...askExtras
+    });
+    $('ask-badge1').textContent=topic;
+    $('ask-badge2').textContent=getActive('ask-format');
+    $('ask-badge3').textContent=getActive('ask-difficulty').replace('a ','').replace(' student','');
+    showOutput('ask-out','ask-out-body',data.answer);
+    saveHist(q, data.answer, 'ask');
+  } catch(e){ showErr('ask-out-body','ask-out',e.message); }
+  finally { setLoading('ask',false,'Ask'); }
+});
+setupTopicChips('ask-topic-chips','ask-custom-topic',()=>{});
+
+// ══════════════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════════════
+const quizExtras = getToggles('quiz-extras');
+$('quiz-btn').addEventListener('click', async ()=>{
+  const topic = getActiveTopic('quiz-topic-chips') || $('quiz-custom-topic').value.trim() || 'General';
+  const subtopic = $('quiz-subtopic').value.trim();
+  setLoading('quiz',true,'Generate Quiz');
+  $('quiz-out').style.display='none';
+  try {
+    const data = await api('/api/generate',{
+      topic, subtopic,
+      qtype: getActive('quiz-type'),
+      qcount: getActive('quiz-count'),
+      difficulty: getActive('quiz-difficulty'),
+      ...quizExtras
+    });
+    $('quiz-badge1').textContent=topic;
+    $('quiz-badge2').textContent=getActive('quiz-type').split('(')[0].trim();
+    $('quiz-badge3').textContent=getActive('quiz-difficulty');
+    showOutput('quiz-out','quiz-out-body',data.questions);
+    saveHist(`${topic} quiz`, data.questions, 'quiz');
+  } catch(e){ showErr('quiz-out-body','quiz-out',e.message); }
+  finally { setLoading('quiz',false,'Generate Quiz'); }
+});
+setupTopicChips('quiz-topic-chips','quiz-custom-topic',()=>{});
+
+// ══════════════════════════════════════════════════
+//  FLASHCARDS
+// ══════════════════════════════════════════════════
+const fcExtras = getToggles('fc-extras');
+$('fc-btn').addEventListener('click', async ()=>{
+  const topic = getActiveTopic('fc-topic-chips') || $('fc-custom-topic').value.trim() || 'Spanish Vocabulary';
+  const subtopic = $('fc-subtopic').value.trim();
+  setLoading('fc',true,'Generate Flashcards');
+  $('fc-output').style.display='none';
+  try {
+    const data = await api('/api/flashcards',{
+      topic, subtopic,
+      count: getActive('fc-count'),
+      style: getActive('fc-style'),
+      ...fcExtras
+    });
+    renderFlashcards(data.cards, data.raw);
+    saveHist(`${topic} flashcards`, data.raw, 'flashcards');
+  } catch(e){ showErr('fc-grid','fc-output',e.message); $('fc-output').style.display='block'; }
+  finally { setLoading('fc',false,'Generate Flashcards'); }
+});
+setupTopicChips('fc-topic-chips','fc-custom-topic',()=>{});
+
+function renderFlashcards(cards, raw) {
+  $('fc-raw').textContent = raw;
+  $('fc-grid').innerHTML = cards.map((c,i)=>`
+    <div class="flashcard" data-i="${i}">
+      <div class="fc-label">Front</div>
+      <div class="fc-front">${esc(c.front)}</div>
+      <div class="fc-back">${esc(c.back)}</div>
+      <span class="fc-hint">tap to flip</span>
+    </div>`).join('');
+  $('fc-grid').querySelectorAll('.flashcard').forEach(fc=>{
+    fc.addEventListener('click',()=>{
+      fc.classList.toggle('flipped');
+      fc.querySelector('.fc-hint').textContent = fc.classList.contains('flipped') ? 'tap to hide' : 'tap to flip';
+      fc.querySelector('.fc-label').textContent = fc.classList.contains('flipped') ? 'Answer' : 'Front';
+    });
+  });
+  $('fc-output').style.display='block';
+  $('fc-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ══════════════════════════════════════════════════
+//  STUDY GUIDE
+// ══════════════════════════════════════════════════
+const sgExtras = getToggles('sg-extras');
+$('sg-btn').addEventListener('click', async ()=>{
+  const topic = getActiveTopic('sg-topic-chips') || $('sg-custom-topic').value.trim() || 'General';
+  const unit = $('sg-unit').value.trim();
+  setLoading('sg',true,'Generate Study Guide');
+  $('sg-out').style.display='none';
+  try {
+    const data = await api('/api/studyguide',{
+      topic, unit,
+      type: getActive('sg-type'),
+      difficulty: getActive('sg-difficulty'),
+      ...sgExtras
+    });
+    $('sg-badge1').textContent=topic;
+    $('sg-badge2').textContent=getActive('sg-type').split(' ')[0];
+    showOutput('sg-out','sg-out-body',data.guide);
+    saveHist(`${topic} study guide`, data.guide, 'studyguide');
+  } catch(e){ showErr('sg-out-body','sg-out',e.message); }
+  finally { setLoading('sg',false,'Generate Study Guide'); }
+});
+setupTopicChips('sg-topic-chips','sg-custom-topic',()=>{});
+
+// ══════════════════════════════════════════════════
+//  ESSAY
+// ══════════════════════════════════════════════════
+$('essay-btn').addEventListener('click', async ()=>{
+  const topic = $('essay-topic').value.trim();
+  if (!topic) { $('essay-topic').style.borderColor='#ef4444'; setTimeout(()=>$('essay-topic').style.borderColor='',1000); return; }
+  setLoading('essay',true,'Help With Essay');
+  $('essay-out').style.display='none';
+  try {
+    const data = await api('/api/essay',{
+      topic,
+      existing: $('essay-existing').value.trim(),
+      mode: getActive('essay-mode'),
+      type: getActive('essay-type'),
+      level: getActive('essay-level')
+    });
+    $('essay-badge').textContent=getActive('essay-mode');
+    showOutput('essay-out','essay-out-body',data.result);
+    saveHist(`Essay: ${topic}`, data.result, 'essay');
+  } catch(e){ showErr('essay-out-body','essay-out',e.message); }
+  finally { setLoading('essay',false,'Help With Essay'); }
+});
+
+// ══════════════════════════════════════════════════
+//  VOCAB
+// ══════════════════════════════════════════════════
+const vocabExtras = getToggles('vocab-extras');
+$('vocab-btn').addEventListener('click', async ()=>{
+  const topic = getActiveTopic('vocab-topic-chips') || $('vocab-custom').value.trim() || 'Spanish';
+  const focus = $('vocab-focus').value.trim();
+  setLoading('vocab',true,'Build Vocabulary List');
+  $('vocab-out').style.display='none';
+  try {
+    const data = await api('/api/vocab',{
+      topic, focus,
+      count: getActive('vocab-count'),
+      level: getActive('vocab-level'),
+      ...vocabExtras
+    });
+    $('vocab-badge').textContent=topic;
+    showOutput('vocab-out','vocab-out-body',data.list);
+    saveHist(`${topic} vocabulary`, data.list, 'vocab');
+  } catch(e){ showErr('vocab-out-body','vocab-out',e.message); }
+  finally { setLoading('vocab',false,'Build Vocabulary List'); }
+});
+setupTopicChips('vocab-topic-chips','vocab-custom',()=>{});
+
+// ══════════════════════════════════════════════════
+//  MATH
+// ══════════════════════════════════════════════════
+const mathExtras = getToggles('math-extras');
+$('math-btn').addEventListener('click', async ()=>{
+  const problem = $('math-problem').value.trim();
+  if (!problem) { $('math-problem').style.borderColor='#ef4444'; setTimeout(()=>$('math-problem').style.borderColor='',1000); return; }
+  const type = getActiveTopic('math-type-chips');
+  setLoading('math',true,'Solve Problem');
+  $('math-out').style.display='none';
+  try {
+    const data = await api('/api/math',{
+      problem, type,
+      style: getActive('math-style'),
+      ...mathExtras
+    });
+    $('math-badge').textContent=type;
+    showOutput('math-out','math-out-body',data.solution);
+    saveHist(`Math: ${problem.slice(0,40)}`, data.solution, 'math');
+  } catch(e){ showErr('math-out-body','math-out',e.message); }
+  finally { setLoading('math',false,'Solve Problem'); }
+});
+setupTopicChips('math-type-chips','_',()=>{});
+
+// ══════════════════════════════════════════════════
+//  TRANSLATE
+// ══════════════════════════════════════════════════
+const transExtras = getToggles('trans-extras');
+$('trans-btn').addEventListener('click', async ()=>{
+  const text = $('trans-text').value.trim();
+  if (!text) { $('trans-text').style.borderColor='#ef4444'; setTimeout(()=>$('trans-text').style.borderColor='',1000); return; }
+  const from = getActive('trans-from');
+  const to = getActive('trans-to');
+  setLoading('trans',true,'Translate');
+  $('trans-out').style.display='none';
+  try {
+    const data = await api('/api/translate',{ text, from, to, ...transExtras });
+    $('trans-badge').textContent=`${from.slice(0,2).toUpperCase()} → ${to.slice(0,2).toUpperCase()}`;
+    showOutput('trans-out','trans-out-body',data.translation);
+    saveHist(`Translate: ${text.slice(0,40)}`, data.translation, 'translate');
+  } catch(e){ showErr('trans-out-body','trans-out',e.message); }
+  finally { setLoading('trans',false,'Translate'); }
+});
+
+// ══════════════════════════════════════════════════
+//  GRAMMAR
+// ══════════════════════════════════════════════════
+const gramExtras = getToggles('gram-extras');
+$('gram-btn').addEventListener('click', async ()=>{
+  const text = $('gram-text').value.trim();
+  if (!text) { $('gram-text').style.borderColor='#ef4444'; setTimeout(()=>$('gram-text').style.borderColor='',1000); return; }
+  setLoading('gram',true,'Check Grammar');
+  $('gram-out').style.display='none';
+  try {
+    const data = await api('/api/grammar',{
+      text, lang: getActive('gram-lang'), type: getActive('gram-type'), ...gramExtras
+    });
+    $('gram-badge').textContent=getActive('gram-lang');
+    showOutput('gram-out','gram-out-body',data.result);
+    saveHist('Grammar check', data.result, 'grammar');
+  } catch(e){ showErr('gram-out-body','gram-out',e.message); }
+  finally { setLoading('gram',false,'Check Grammar'); }
+});
+
+// ══════════════════════════════════════════════════
+//  SUMMARIZE
+// ══════════════════════════════════════════════════
+const sumExtras = getToggles('sum-extras');
+$('sum-btn').addEventListener('click', async ()=>{
+  const text = $('sum-text').value.trim();
+  if (!text) { $('sum-text').style.borderColor='#ef4444'; setTimeout(()=>$('sum-text').style.borderColor='',1000); return; }
+  setLoading('sum',true,'Summarize');
+  $('sum-out').style.display='none';
+  try {
+    const data = await api('/api/summarize',{
+      text, length: getActive('sum-length'), style: getActive('sum-style'), ...sumExtras
+    });
+    showOutput('sum-out','sum-out-body',data.summary);
+    saveHist('Summary', data.summary, 'summarize');
+  } catch(e){ showErr('sum-out-body','sum-out',e.message); }
+  finally { setLoading('sum',false,'Summarize'); }
+});
+
+// ══════════════════════════════════════════════════
+//  DEBATE
+// ══════════════════════════════════════════════════
+const debateExtras = getToggles('debate-extras');
+$('debate-btn').addEventListener('click', async ()=>{
+  const topic = $('debate-topic').value.trim();
+  if (!topic) { $('debate-topic').style.borderColor='#ef4444'; setTimeout(()=>$('debate-topic').style.borderColor='',1000); return; }
+  setLoading('debate',true,'Show Both Sides');
+  $('debate-out').style.display='none';
+  try {
+    const data = await api('/api/debate',{
+      topic, depth: getActive('debate-depth'), level: getActive('debate-level'), ...debateExtras
+    });
+    $('debate-badge').textContent=topic.slice(0,30);
+    showOutput('debate-out','debate-out-body',data.result);
+    saveHist(`Debate: ${topic}`, data.result, 'debate');
+  } catch(e){ showErr('debate-out-body','debate-out',e.message); }
+  finally { setLoading('debate',false,'Show Both Sides'); }
+});
+
+// ══════════════════════════════════════════════════
+//  TIMELINE
+// ══════════════════════════════════════════════════
+const tlExtras = getToggles('tl-extras');
+$('tl-btn').addEventListener('click', async ()=>{
+  const topic = $('tl-topic').value.trim();
+  if (!topic) { $('tl-topic').style.borderColor='#ef4444'; setTimeout(()=>$('tl-topic').style.borderColor='',1000); return; }
+  setLoading('tl',true,'Generate Timeline');
+  $('tl-out').style.display='none';
+  try {
+    const data = await api('/api/timeline',{
+      topic, detail: getActive('tl-detail'), ...tlExtras
+    });
+    $('tl-badge').textContent=topic.slice(0,25);
+    showOutput('tl-out','tl-out-body',data.timeline);
+    saveHist(`Timeline: ${topic}`, data.timeline, 'timeline');
+  } catch(e){ showErr('tl-out-body','tl-out',e.message); }
+  finally { setLoading('tl',false,'Generate Timeline'); }
+});
+
+// ══════════════════════════════════════════════════
+//  ELI5
+// ══════════════════════════════════════════════════
+$('eli5-btn').addEventListener('click', async ()=>{
+  const topic = $('eli5-topic').value.trim();
+  if (!topic) { $('eli5-topic').style.borderColor='#ef4444'; setTimeout(()=>$('eli5-topic').style.borderColor='',1000); return; }
+  setLoading('eli5',true,'Explain It!');
+  $('eli5-out').style.display='none';
+  try {
+    const data = await api('/api/eli5',{
+      topic, age: getActive('eli5-age'), style: getActive('eli5-style')
+    });
+    $('eli5-badge').textContent=topic.slice(0,25);
+    showOutput('eli5-out','eli5-out-body',data.explanation);
+    saveHist(`ELI5: ${topic}`, data.explanation, 'explain');
+  } catch(e){ showErr('eli5-out-body','eli5-out',e.message); }
+  finally { setLoading('eli5',false,'Explain It!'); }
+});
+
+// ══════════════════════════════════════════════════
+//  COMPARE
+// ══════════════════════════════════════════════════
+$('cmp-btn').addEventListener('click', async ()=>{
+  const a = $('cmp-a').value.trim(), b = $('cmp-b').value.trim();
+  if (!a||!b) return;
+  setLoading('cmp',true,'Compare');
+  $('cmp-out').style.display='none';
+  try {
+    const data = await api('/api/compare',{
+      a, b, context: $('cmp-context').value.trim(),
+      format: getActive('cmp-format'), depth: getActive('cmp-depth')
+    });
+    $('cmp-badge').textContent=`${a.slice(0,12)} vs ${b.slice(0,12)}`;
+    showOutput('cmp-out','cmp-out-body',data.comparison);
+    saveHist(`Compare: ${a} vs ${b}`, data.comparison, 'compare');
+  } catch(e){ showErr('cmp-out-body','cmp-out',e.message); }
+  finally { setLoading('cmp',false,'Compare'); }
+});
+
+// ══════════════════════════════════════════════════
+//  MIND MAP
+// ══════════════════════════════════════════════════
+$('mm-btn').addEventListener('click', async ()=>{
+  const topic = $('mm-topic').value.trim();
+  if (!topic) { $('mm-topic').style.borderColor='#ef4444'; setTimeout(()=>$('mm-topic').style.borderColor='',1000); return; }
+  setLoading('mm',true,'Build Mind Map');
+  $('mm-out').style.display='none';
+  try {
+    const data = await api('/api/mindmap',{
+      topic, depth: getActive('mm-depth'), focus: getActive('mm-focus')
+    });
+    $('mm-badge').textContent=topic.slice(0,25);
+    showOutput('mm-out','mm-out-body',data.mindmap);
+    saveHist(`Mind Map: ${topic}`, data.mindmap, 'mindmap');
+  } catch(e){ showErr('mm-out-body','mm-out',e.message); }
+  finally { setLoading('mm',false,'Build Mind Map'); }
+});
+
+renderHist();
 </script>
 </body>
 </html>
