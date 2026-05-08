@@ -60,5 +60,36 @@ ${extras.join('\n')}`.trim();
   }
 });
 
+app.post('/api/generate', async (req, res) => {
+  const { topic, subtopic, qtype, qcount, difficulty, answerkey, hints, explanations, numbered, varied } = req.body;
+
+  const focus = subtopic ? `focused on: ${subtopic}` : '';
+  const extras = [];
+  if (answerkey)    extras.push('After all questions, include a clearly labeled Answer Key.');
+  if (hints)        extras.push('Include a short hint below each question.');
+  if (explanations) extras.push('After the answer key, briefly explain why each answer is correct.');
+  if (varied)       extras.push('Vary the difficulty slightly across questions (some easier, some harder).');
+
+  const systemPrompt = `You are an expert teacher creating a practice quiz.
+Generate exactly ${qcount} ${qtype} questions about ${topic} ${focus}.
+Difficulty level: ${difficulty}.
+${numbered ? 'Number each question.' : ''}
+${extras.join('\n')}
+Make the questions clear, accurate, and educational.`.trim();
+
+  try {
+    const message = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Generate ${qcount} ${qtype} questions about ${topic} ${focus} at ${difficulty} level.` }]
+    });
+    res.json({ questions: message.content[0].text });
+  } catch (err) {
+    console.error('Anthropic error:', err.message);
+    res.status(500).json({ error: err.message || 'Failed to generate questions.' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
