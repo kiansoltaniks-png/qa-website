@@ -6,7 +6,6 @@
   <title>Ask Anything</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: #0f0f1a;
@@ -16,56 +15,56 @@
       flex-direction: column;
     }
 
-    /* ── Header ── */
     header {
-      padding: 28px 32px 20px;
+      padding: 24px 32px 18px;
       background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
       border-bottom: 1px solid #4338ca44;
       display: flex;
       align-items: center;
       gap: 14px;
     }
-    header .logo { font-size: 2rem; }
+    header .logo { font-size: 1.9rem; }
     header h1 {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 700;
       background: linear-gradient(90deg, #a78bfa, #60a5fa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    header p { font-size: 0.85rem; color: #94a3b8; margin-top: 2px; }
+    header p { font-size: 0.82rem; color: #94a3b8; margin-top: 2px; }
 
-    /* ── Main ── */
     main {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: 860px;
+      max-width: 900px;
       width: 100%;
       margin: 0 auto;
-      padding: 32px 24px;
-      gap: 24px;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    /* ── Topic chips ── */
-    .topic-section label {
-      font-size: 0.8rem;
-      color: #94a3b8;
+    /* ── Section labels ── */
+    .sec-label {
+      font-size: 0.75rem;
+      color: #64748b;
       text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 10px;
+      letter-spacing: .07em;
+      margin-bottom: 8px;
       display: block;
     }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* ── Chips ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
     .chip {
-      padding: 7px 16px;
+      padding: 6px 14px;
       border-radius: 999px;
       border: 1px solid #334155;
       background: #1e293b;
       color: #cbd5e1;
-      font-size: 0.83rem;
+      font-size: 0.8rem;
       cursor: pointer;
-      transition: all .18s;
+      transition: all .15s;
       user-select: none;
     }
     .chip:hover { border-color: #7c3aed; color: #a78bfa; }
@@ -76,34 +75,127 @@
       font-weight: 600;
     }
     #custom-topic {
-      padding: 7px 14px;
+      padding: 6px 14px;
       border-radius: 999px;
       border: 1px solid #334155;
       background: #1e293b;
       color: #e2e8f0;
-      font-size: 0.83rem;
-      width: 180px;
+      font-size: 0.8rem;
+      width: 160px;
     }
     #custom-topic:focus { outline: 2px solid #7c3aed; }
     #custom-topic::placeholder { color: #475569; }
 
-    /* ── Question box ── */
-    .question-section { display: flex; flex-direction: column; gap: 10px; }
-    .question-section label {
-      font-size: 0.8rem;
+    /* ── Customize panel ── */
+    .customize-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
       color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: .05em;
+      font-size: 0.83rem;
+      user-select: none;
+      width: fit-content;
     }
+    .customize-toggle:hover { color: #a78bfa; }
+    .toggle-arrow { transition: transform .2s; display: inline-block; }
+    .toggle-arrow.open { transform: rotate(90deg); }
+
+    .customize-panel {
+      background: #151f2e;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .customize-panel.open { display: flex; }
+
+    .option-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* radio-style chips */
+    .opt-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .opt-chip {
+      padding: 5px 13px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+    }
+    .opt-chip:hover { border-color: #5b21b6; color: #c4b5fd; }
+    .opt-chip.active {
+      background: #3b0764;
+      border-color: #7c3aed;
+      color: #ddd6fe;
+      font-weight: 600;
+    }
+
+    /* toggle switches */
+    .toggles-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .toggle-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      user-select: none;
+      transition: all .15s;
+    }
+    .toggle-pill.on {
+      background: #134e4a;
+      border-color: #0d9488;
+      color: #5eead4;
+    }
+    .toggle-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #475569;
+      transition: background .15s;
+    }
+    .toggle-pill.on .dot { background: #2dd4bf; }
+
+    /* custom word count */
+    .custom-length-wrap { display: none; align-items: center; gap: 8px; margin-top: 6px; }
+    .custom-length-wrap.show { display: flex; }
+    .custom-length-wrap input {
+      width: 90px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 0.82rem;
+    }
+    .custom-length-wrap input:focus { outline: 2px solid #7c3aed; }
+    .custom-length-wrap span { font-size: 0.78rem; color: #64748b; }
+
+    /* divider */
+    .divider { border: none; border-top: 1px solid #1e293b; }
+
+    /* ── Question ── */
     #question-input {
       width: 100%;
-      min-height: 100px;
-      padding: 14px 16px;
+      min-height: 95px;
+      padding: 13px 15px;
       border-radius: 12px;
       border: 1px solid #334155;
       background: #1e293b;
       color: #e2e8f0;
-      font-size: 1rem;
+      font-size: 0.97rem;
       font-family: inherit;
       resize: vertical;
       transition: border-color .18s;
@@ -111,15 +203,14 @@
     #question-input:focus { outline: none; border-color: #7c3aed; }
     #question-input::placeholder { color: #475569; }
 
-    /* ── Ask button ── */
     #ask-btn {
       align-self: flex-end;
-      padding: 12px 32px;
+      padding: 11px 30px;
       border-radius: 12px;
       border: none;
       background: linear-gradient(135deg, #7c3aed, #4f46e5);
       color: white;
-      font-size: 1rem;
+      font-size: 0.97rem;
       font-weight: 600;
       cursor: pointer;
       transition: opacity .18s, transform .1s;
@@ -131,9 +222,8 @@
     #ask-btn:active { transform: scale(.97); }
     #ask-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* ── Spinner ── */
     .spinner {
-      width: 16px; height: 16px;
+      width: 15px; height: 15px;
       border: 2px solid rgba(255,255,255,.3);
       border-top-color: white;
       border-radius: 50%;
@@ -142,7 +232,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Answer card ── */
+    /* ── Answer ── */
     #answer-section { display: none; }
     .answer-card {
       background: #1e293b;
@@ -152,73 +242,81 @@
     }
     .answer-header {
       background: linear-gradient(90deg, #1e1b4b, #1e293b);
-      padding: 12px 20px;
+      padding: 11px 18px;
       display: flex;
       align-items: center;
       gap: 8px;
       border-bottom: 1px solid #334155;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: #94a3b8;
+      flex-wrap: wrap;
     }
-    .answer-header .badge {
+    .badge {
       padding: 3px 10px;
       background: #4c1d95;
       border-radius: 999px;
       color: #ddd6fe;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 600;
     }
+    .badge.green { background: #134e4a; color: #5eead4; }
+    .badge.blue  { background: #1e3a5f; color: #93c5fd; }
     .answer-body {
-      padding: 20px 24px;
-      line-height: 1.75;
-      font-size: 0.97rem;
+      padding: 18px 22px;
+      line-height: 1.8;
+      font-size: 0.95rem;
       white-space: pre-wrap;
     }
+    .copy-btn {
+      margin-left: auto;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #64748b;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .copy-btn:hover { border-color: #7c3aed; color: #a78bfa; }
 
     /* ── History ── */
-    #history-section { margin-top: 8px; }
     #history-section h2 {
-      font-size: 0.8rem;
-      color: #94a3b8;
+      font-size: 0.75rem;
+      color: #64748b;
       text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 12px;
+      letter-spacing: .07em;
+      margin-bottom: 10px;
     }
-    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-list { display: flex; flex-direction: column; gap: 7px; }
     .history-item {
       background: #1e293b;
       border: 1px solid #273344;
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       cursor: pointer;
-      transition: border-color .18s;
+      transition: border-color .15s;
     }
     .history-item:hover { border-color: #7c3aed; }
     .history-item .q {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .history-item .meta { font-size: 0.74rem; color: #475569; margin-top: 3px; }
+    .history-item .meta { font-size: 0.72rem; color: #475569; margin-top: 2px; }
 
-    /* ── Error ── */
     .error-msg {
       background: #450a0a;
       border: 1px solid #991b1b;
       color: #fca5a5;
-      padding: 12px 16px;
+      padding: 11px 14px;
       border-radius: 10px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
     }
 
-    footer {
-      text-align: center;
-      padding: 16px;
-      font-size: 0.75rem;
-      color: #334155;
-    }
+    footer { text-align: center; padding: 14px; font-size: 0.72rem; color: #334155; }
   </style>
 </head>
 <body>
@@ -233,9 +331,9 @@
 
 <main>
 
-  <!-- Topic Chips -->
-  <div class="topic-section">
-    <label>Choose a Topic</label>
+  <!-- Topic -->
+  <div>
+    <span class="sec-label">Topic</span>
     <div class="chips">
       <div class="chip active" data-topic="Spanish">🇪🇸 Spanish</div>
       <div class="chip" data-topic="Language Arts">✏️ Language Arts</div>
@@ -244,16 +342,132 @@
       <div class="chip" data-topic="History">🏛️ History</div>
       <div class="chip" data-topic="Grammar">📖 Grammar</div>
       <div class="chip" data-topic="Writing">🖊️ Writing</div>
+      <div class="chip" data-topic="Geography">🌍 Geography</div>
+      <div class="chip" data-topic="Biology">🧬 Biology</div>
       <div class="chip" data-topic="custom">✨ Other...</div>
     </div>
-    <div style="margin-top:10px; display:none;" id="custom-wrap">
+    <div style="margin-top:8px; display:none;" id="custom-wrap">
       <input id="custom-topic" type="text" placeholder="Type your topic…" />
     </div>
   </div>
 
+  <!-- Customize toggle -->
+  <div>
+    <div class="customize-toggle" id="customize-toggle">
+      <span class="toggle-arrow" id="toggle-arrow">▶</span>
+      <span>Customize Answer</span>
+    </div>
+
+    <div class="customize-panel" id="customize-panel" style="margin-top:10px;">
+
+      <!-- Length -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Answer Length</span>
+        <div class="opt-chips" id="length-chips">
+          <div class="opt-chip" data-val="1 sentence">1 Sentence</div>
+          <div class="opt-chip" data-val="2-3 sentences">2-3 Sentences</div>
+          <div class="opt-chip active" data-val="a paragraph">Paragraph</div>
+          <div class="opt-chip" data-val="detailed and thorough">Detailed</div>
+          <div class="opt-chip" data-val="as comprehensive as possible">Full Deep Dive</div>
+          <div class="opt-chip" data-val="custom">Custom...</div>
+        </div>
+        <div class="custom-length-wrap" id="custom-length-wrap">
+          <input type="number" id="custom-words" placeholder="150" min="10" max="2000" />
+          <span>max words</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Format -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Format</span>
+        <div class="opt-chips" id="format-chips">
+          <div class="opt-chip active" data-val="paragraph">📄 Paragraph</div>
+          <div class="opt-chip" data-val="bullet points">• Bullet Points</div>
+          <div class="opt-chip" data-val="numbered steps">1. Numbered Steps</div>
+          <div class="opt-chip" data-val="a structured outline with headers">📋 Outline</div>
+          <div class="opt-chip" data-val="a table if applicable, otherwise paragraph">📊 Table</div>
+          <div class="opt-chip" data-val="a story or narrative">📖 Story</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Difficulty -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Difficulty Level</span>
+        <div class="opt-chips" id="difficulty-chips">
+          <div class="opt-chip" data-val="a 5 year old">🧒 5 Year Old</div>
+          <div class="opt-chip" data-val="an elementary school student">🎒 Elementary</div>
+          <div class="opt-chip active" data-val="a middle school student">📚 Middle School</div>
+          <div class="opt-chip" data-val="a high school student">🏫 High School</div>
+          <div class="opt-chip" data-val="a college student">🎓 College</div>
+          <div class="opt-chip" data-val="an expert in the field">🔬 Expert</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Tone -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Tone</span>
+        <div class="opt-chips" id="tone-chips">
+          <div class="opt-chip active" data-val="friendly and encouraging">😊 Friendly</div>
+          <div class="opt-chip" data-val="professional and formal">👔 Professional</div>
+          <div class="opt-chip" data-val="casual and conversational">💬 Casual</div>
+          <div class="opt-chip" data-val="enthusiastic and energetic">⚡ Enthusiastic</div>
+          <div class="opt-chip" data-val="strict and no-nonsense">📏 Strict</div>
+          <div class="opt-chip" data-val="funny and humorous">😄 Funny</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Language -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Response Language</span>
+        <div class="opt-chips" id="language-chips">
+          <div class="opt-chip active" data-val="English">🇺🇸 English</div>
+          <div class="opt-chip" data-val="Spanish">🇪🇸 Spanish</div>
+          <div class="opt-chip" data-val="both English and Spanish side by side">🇺🇸🇪🇸 Bilingual</div>
+          <div class="opt-chip" data-val="simple English (avoid complex words)">🔤 Simple English</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Extra toggles -->
+      <div class="option-row">
+        <span class="sec-label" style="margin-bottom:0">Extras</span>
+        <div class="toggles-row">
+          <div class="toggle-pill on" data-key="examples" title="Include real-world examples">
+            <div class="dot"></div> Include Examples
+          </div>
+          <div class="toggle-pill" data-key="followup" title="Suggest follow-up questions">
+            <div class="dot"></div> Follow-up Questions
+          </div>
+          <div class="toggle-pill" data-key="funfact" title="Add a fun fact at the end">
+            <div class="dot"></div> Fun Fact
+          </div>
+          <div class="toggle-pill" data-key="summary" title="Add a TL;DR summary at the end">
+            <div class="dot"></div> TL;DR Summary
+          </div>
+          <div class="toggle-pill" data-key="mnemonic" title="Add a memory trick to help remember">
+            <div class="dot"></div> Memory Trick
+          </div>
+          <div class="toggle-pill" data-key="commonmistakes" title="Point out common mistakes">
+            <div class="dot"></div> Common Mistakes
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Question -->
-  <div class="question-section">
-    <label>Your Question</label>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <span class="sec-label">Your Question</span>
     <textarea id="question-input" placeholder="Type your question here… e.g. ¿Cómo se usa el subjuntivo?"></textarea>
     <button id="ask-btn">
       <span id="btn-text">Ask</span>
@@ -267,7 +481,10 @@
     <div class="answer-card">
       <div class="answer-header">
         <span>Answer</span>
-        <span class="badge" id="answer-topic-badge">Spanish</span>
+        <span class="badge" id="badge-topic">Spanish</span>
+        <span class="badge blue" id="badge-format">Paragraph</span>
+        <span class="badge green" id="badge-level">Middle School</span>
+        <button class="copy-btn" id="copy-btn">Copy</button>
       </div>
       <div class="answer-body" id="answer-body"></div>
     </div>
@@ -284,10 +501,26 @@
 <footer>Ask Anything · Your personal study assistant</footer>
 
 <script>
+  // ── State ──
   let selectedTopic = 'Spanish';
   let history = JSON.parse(localStorage.getItem('qa_history') || '[]');
 
-  // ── Chips ──
+  const opts = {
+    length: 'a paragraph',
+    format: 'paragraph',
+    difficulty: 'a middle school student',
+    tone: 'friendly and encouraging',
+    language: 'English',
+    examples: true,
+    followup: false,
+    funfact: false,
+    summary: false,
+    mnemonic: false,
+    commonmistakes: false,
+    customWords: null
+  };
+
+  // ── Topic chips ──
   const chips      = document.querySelectorAll('.chip');
   const customWrap = document.getElementById('custom-wrap');
   const customIn   = document.getElementById('custom-topic');
@@ -306,44 +539,96 @@
       }
     });
   });
-  customIn.addEventListener('input', () => {
-    selectedTopic = customIn.value.trim() || 'General';
+  customIn.addEventListener('input', () => { selectedTopic = customIn.value.trim() || 'General'; });
+
+  // ── Customize toggle ──
+  document.getElementById('customize-toggle').addEventListener('click', () => {
+    const panel = document.getElementById('customize-panel');
+    const arrow = document.getElementById('toggle-arrow');
+    panel.classList.toggle('open');
+    arrow.classList.toggle('open');
+  });
+
+  // ── Option chips (single-select groups) ──
+  function setupOptChips(groupId, key) {
+    document.querySelectorAll(`#${groupId} .opt-chip`).forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll(`#${groupId} .opt-chip`).forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        if (key === 'length' && chip.dataset.val === 'custom') {
+          document.getElementById('custom-length-wrap').classList.add('show');
+        } else if (key === 'length') {
+          document.getElementById('custom-length-wrap').classList.remove('show');
+          opts[key] = chip.dataset.val;
+        } else {
+          opts[key] = chip.dataset.val;
+        }
+      });
+    });
+  }
+  setupOptChips('length-chips', 'length');
+  setupOptChips('format-chips', 'format');
+  setupOptChips('difficulty-chips', 'difficulty');
+  setupOptChips('tone-chips', 'tone');
+  setupOptChips('language-chips', 'language');
+
+  document.getElementById('custom-words').addEventListener('input', e => {
+    opts.customWords = parseInt(e.target.value) || null;
+  });
+
+  // ── Toggle pills ──
+  document.querySelectorAll('.toggle-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      pill.classList.toggle('on');
+      opts[pill.dataset.key] = pill.classList.contains('on');
+    });
   });
 
   // ── Ask ──
-  const askBtn     = document.getElementById('ask-btn');
-  const btnText    = document.getElementById('btn-text');
-  const btnIcon    = document.getElementById('btn-icon');
-  const spinner    = document.getElementById('spinner');
-  const qInput     = document.getElementById('question-input');
-  const ansSection = document.getElementById('answer-section');
-  const ansBody    = document.getElementById('answer-body');
-  const ansBadge   = document.getElementById('answer-topic-badge');
+  const askBtn  = document.getElementById('ask-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnIcon = document.getElementById('btn-icon');
+  const spinner = document.getElementById('spinner');
+  const qInput  = document.getElementById('question-input');
 
   askBtn.addEventListener('click', askQuestion);
-  qInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) askQuestion();
-  });
+  qInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) askQuestion(); });
 
   async function askQuestion() {
     const q = qInput.value.trim();
     if (!q) { shake(qInput); return; }
 
     setLoading(true);
-    ansSection.style.display = 'none';
+    document.getElementById('answer-section').style.display = 'none';
+
+    const lengthVal = opts.customWords ? `at most ${opts.customWords} words` : opts.length;
 
     try {
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, topic: selectedTopic })
+        body: JSON.stringify({
+          question: q,
+          topic: selectedTopic,
+          length: lengthVal,
+          format: opts.format,
+          difficulty: opts.difficulty,
+          tone: opts.tone,
+          language: opts.language,
+          examples: opts.examples,
+          followup: opts.followup,
+          funfact: opts.funfact,
+          summary: opts.summary,
+          mnemonic: opts.mnemonic,
+          commonmistakes: opts.commonmistakes
+        })
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
 
-      showAnswer(data.answer, selectedTopic);
-      saveHistory(q, data.answer, selectedTopic);
+      showAnswer(data.answer);
+      saveHistory(q, data.answer);
     } catch (err) {
       showError(err.message);
     } finally {
@@ -351,17 +636,18 @@
     }
   }
 
-  function showAnswer(text, topic) {
-    ansBadge.textContent = topic;
-    ansBody.textContent = text;
-    ansSection.style.display = 'block';
-    ansSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  function showAnswer(text) {
+    document.getElementById('badge-topic').textContent = selectedTopic;
+    document.getElementById('badge-format').textContent = opts.format;
+    document.getElementById('badge-level').textContent = opts.difficulty.replace('a ', '').replace(' student', '');
+    document.getElementById('answer-body').textContent = text;
+    document.getElementById('answer-section').style.display = 'block';
+    document.getElementById('answer-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function showError(msg) {
-    ansBody.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
-    ansBadge.textContent = 'Error';
-    ansSection.style.display = 'block';
+    document.getElementById('answer-body').innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+    document.getElementById('answer-section').style.display = 'block';
   }
 
   function setLoading(on) {
@@ -371,8 +657,19 @@
     btnIcon.style.display = on ? 'none' : 'inline';
   }
 
-  function saveHistory(q, a, topic) {
-    history.unshift({ q, a, topic, time: Date.now() });
+  // ── Copy ──
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    const text = document.getElementById('answer-body').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  });
+
+  // ── History ──
+  function saveHistory(q, a) {
+    history.unshift({ q, a, topic: selectedTopic, time: Date.now() });
     if (history.length > 20) history = history.slice(0, 20);
     localStorage.setItem('qa_history', JSON.stringify(history));
     renderHistory();
@@ -385,7 +682,7 @@
     sec.style.display = 'block';
     list.innerHTML = history.slice(0, 6).map((item, i) => `
       <div class="history-item" data-index="${i}">
-        <div class="q">${escHtml(item.q)}</div>
+        <div class="q">${esc(item.q)}</div>
         <div class="meta">${item.topic} · ${timeAgo(item.time)}</div>
       </div>
     `).join('');
@@ -393,15 +690,12 @@
       el.addEventListener('click', () => {
         const item = history[+el.dataset.index];
         qInput.value = item.q;
-        showAnswer(item.a, item.topic);
+        showAnswer(item.a);
       });
     });
   }
 
-  function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function timeAgo(ts) {
     const s = Math.floor((Date.now() - ts) / 1000);
     if (s < 60) return 'just now';
@@ -409,11 +703,7 @@
     if (s < 86400) return `${Math.floor(s/3600)}h ago`;
     return `${Math.floor(s/86400)}d ago`;
   }
-
-  function shake(el) {
-    el.style.borderColor = '#ef4444';
-    setTimeout(() => { el.style.borderColor = ''; }, 1000);
-  }
+  function shake(el) { el.style.borderColor = '#ef4444'; setTimeout(() => el.style.borderColor = '', 1000); }
 
   renderHistory();
 </script>
