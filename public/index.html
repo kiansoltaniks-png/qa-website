@@ -297,7 +297,7 @@
 
     <textarea id="ask-q" placeholder="Type your question… e.g. What is the difference between ser and estar?"></textarea>
     <div class="btn-row">
-      <button class="btn btn-purple" id="ask-btn">
+      <button class="btn btn-purple" id="ask-btn"
         <span id="ask-btn-txt">Ask</span><span id="ask-btn-icon">→</span><div class="spinner" id="ask-spin"></div>
       </button>
     </div>
@@ -1214,8 +1214,9 @@
 // ══════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════
+console.log('JS loaded');
 const $ = id => document.getElementById(id);
-let history = JSON.parse(localStorage.getItem('studyai_history')||'[]');
+let qaHistory = JSON.parse(localStorage.getItem('studyai_history')||'[]');
 
 // Setup single-select opt-chips group
 function setupOpts(groupId, obj, key, onCustom) {
@@ -1236,16 +1237,16 @@ function getActive(groupId) {
 
 // Setup topic chips (uses data-t)
 function setupTopicChips(chipsId, customInputId, setter) {
-  const input = $(customInputId);
+  const input = customInputId ? $(customInputId) : null;
   document.querySelectorAll(`#${chipsId} .chip`).forEach(c => {
     c.addEventListener('click', () => {
       document.querySelectorAll(`#${chipsId} .chip`).forEach(x => x.classList.remove('active'));
       c.classList.add('active');
-      if (c.dataset.t === 'custom') {
+      if (c.dataset.t === 'custom' && input) {
         input.style.display = 'block'; input.focus();
         setter(input.value.trim()||'General');
       } else {
-        input.style.display = 'none';
+        if (input) input.style.display = 'none';
         setter(c.dataset.t);
       }
     });
@@ -1310,23 +1311,23 @@ async function api(endpoint, payload) {
 
 // History
 function saveHist(label, content, section) {
-  history.unshift({label, content, section, time:Date.now()});
-  if (history.length>30) history = history.slice(0,30);
-  localStorage.setItem('studyai_history', JSON.stringify(history));
+  qaHistory.unshift({label, content, section, time:Date.now()});
+  if (qaHistory.length>30) qaHistory = qaHistory.slice(0,30);
+  localStorage.setItem('studyai_history', JSON.stringify(qaHistory));
   renderHist();
 }
 function renderHist() {
   const sec = $('history-section'), list = $('history-list');
-  if (!history.length){sec.style.display='none';return;}
+  if (!qaHistory.length){sec.style.display='none';return;}
   sec.style.display='block';
-  list.innerHTML = history.slice(0,8).map((h,i)=>`
+  list.innerHTML = qaHistory.slice(0,8).map((h,i)=>`
     <div class="history-item" data-i="${i}">
       <div class="q">${esc(h.label)}</div>
       <div class="meta">${h.section} · ${timeAgo(h.time)}</div>
     </div>`).join('');
   list.querySelectorAll('.history-item').forEach(el=>{
     el.addEventListener('click',()=>{
-      const h = history[+el.dataset.i];
+      const h = qaHistory[+el.dataset.i];
       switchSection(h.section);
     });
   });
@@ -1339,6 +1340,16 @@ function timeAgo(ts){
   if(s<86400) return Math.floor(s/3600)+'h ago';
   return Math.floor(s/86400)+'d ago';
 }
+
+// ── Global opt-chip handler (single-select within each group) ──
+document.querySelectorAll('.opt-chips').forEach(group => {
+  group.querySelectorAll('.opt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      group.querySelectorAll('.opt-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+});
 
 // Copy buttons
 document.querySelectorAll('.copy-btn[data-target]').forEach(btn=>{
@@ -1557,7 +1568,7 @@ $('math-btn').addEventListener('click', async ()=>{
   } catch(e){ showErr('math-out-body','math-out',e.message); }
   finally { setLoading('math',false,'Solve Problem'); }
 });
-setupTopicChips('math-type-chips','_',()=>{});
+setupTopicChips('math-type-chips', null, ()=>{});
 
 // ══════════════════════════════════════════════════
 //  TRANSLATE
